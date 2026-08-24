@@ -180,6 +180,13 @@ footer{padding:40px 0 64px;color:var(--mut);font-size:12.5px;line-height:1.7;bor
   <div class=cell hi><h3>Clone</h3><p class=mut>The full run. It still writes the plan first and presents it, then builds only on your approval. <i>Clone it.</i></p></div>
  </div>
  <p class=mut style="margin-top:18px">Every mode produces a plan. Only <b>Clone</b> writes code — and only after a human says go.</p>
+ <div class="cell hi" style="border:1px solid var(--line2);border-radius:3px;margin-top:18px">
+  <h3>It interviews you first — you don't just paste a URL</h3>
+  <p class=mut>Before touching the target, Blueprint asks the essentials and adapts to your answers:
+  <b class=hl>are you authorized</b> to clone this &middot; <b class=hl>do you have login credentials</b> it may use
+  (the 10&times; lever) &middot; <b class=hl>what is in scope</b> &mdash; the whole product or specific flows &middot;
+  <b class=hl>estimate only, or estimate then build</b>. It asks rather than assumes, and only proceeds once the
+  answers are clear.</p></div>
 </section>
 
 <section>
