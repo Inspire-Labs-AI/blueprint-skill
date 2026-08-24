@@ -19,6 +19,14 @@ npx github:<your-org>/blueprint install
 ```
 Installs the `blueprint` skill + `/blueprint` command into every platform found.
 
+## Requirements
+Before running, the agent needs:
+- **A browser tool** — a Playwright/Chrome MCP (or Node + Playwright for the `recon.mjs` fallback).
+  This is what captures real screens + network APIs; without it, results are guesswork. **#1 gotcha.**
+- **A capable model** — Opus/Sonnet-class. It's an autonomous multi-stage operator.
+- **File write** access (for `blueprint-out/`).
+- **Login credentials** for the target (authorized) if you want the *real* backend, not an inferred one.
+
 ## Use
 ```
 /blueprint https://example.com
