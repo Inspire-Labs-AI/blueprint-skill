@@ -1,0 +1,559 @@
+// MProfit clone — inferred data model (Blueprint Stage 2, DB)
+// Confidence: INFERRED from UI screenshots + DOM under blueprint-out/recon/.
+// No HAR, no authorized DB access — nothing here is observed from a live database.
+// Datasource/generator are placeholders; adapt to the real deployment.
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+// ---------------------------------------------------------------------------
+// Enums
+// ---------------------------------------------------------------------------
+
+enum UserType {
+  INVESTOR            // "I am an Investor" — tracks own/family investments
+  WEALTH_PROFESSIONAL // "I am a Wealth Professional" — advisor/distributor/RIA/CA
+}
+
+enum AssetClass {
+  EQUITY          // Stocks / ETFs
+  MUTUAL_FUND     // MF (NAV-based)
+  BOND            // Traded / listed bonds
+  FNO             // Futures & Options (equity/currency/commodity)
+  FIXED_DEPOSIT   // Bank / corporate FDs
+  NPS             // National Pension System (eNPS)
+  PMS             // Portfolio Management Services
+  AIF             // Alternative Investment Funds
+  EPF_PPF         // EPF / PPF
+  INSURANCE       // Insurance / traditional policies
+  ULIP            // Unit Linked Insurance Plans
+  PRIVATE_EQUITY  // Private / unlisted equity
+  DEPOSIT         // Generic deposits
+  LOAN            // Loans (liability)
+  REAL_ESTATE     // Real estate / property
+  OTHER
+}
+
+enum FnoSegment {
+  EQUITY
+  CURRENCY
+  COMMODITY
+}
+
+enum FnoInstrumentType {
+  FUTURE
+  CALL_OPTION
+  PUT_OPTION
+}
+
+enum TransactionType {
+  BUY
+  SELL
+  DIVIDEND
+  INTEREST
+  BONUS
+  SPLIT
+  RIGHTS
+  MERGER
+  DEMERGER
+  DEPOSIT       // cash / capital in
+  WITHDRAWAL    // cash / capital out
+  CHARGE        // fees, brokerage, tax
+  MATURITY
+  SIP           // recurring MF purchase
+  EXPIRY        // F&O expiry settlement
+}
+
+enum CorporateActionType {
+  DIVIDEND
+  BONUS
+  SPLIT
+  MERGER
+  DEMERGER
+  RIGHTS
+  BUYBACK
+}
+
+enum CapitalGainTerm {
+  SHORT_TERM
+  LONG_TERM
+  INTRA_DAY
+}
+
+enum ImportStatus {
+  PENDING
+  PARSING
+  PARSED
+  IMPORTED
+  FAILED
+  NEEDS_REVIEW
+}
+
+enum ImportChannel {
+  MANUAL_UPLOAD
+  EMAIL_FORWARD
+  BROKER_SYNC
+}
+
+enum SubscriberSegment {
+  INVESTOR
+  WEALTH_PROFESSIONAL
+}
+
+// ---------------------------------------------------------------------------
+// Tenancy, identity & billing
+// ---------------------------------------------------------------------------
+
+// A billing/tenant boundary. An investor typically owns one Account; a wealth
+// professional's Account is a multi-tenant workspace holding many client Users.
+model Account {
+  id            String    @id @default(cuid())
+  name          String
+  segment       SubscriberSegment @default(INVESTOR)
+  // White-label branding for wealth professionals
+  brandLogoUrl  String?
+  brandColor    String?
+  brandName     String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  users            User[]
+  portfolios       Portfolio[]
+  portfolioGroups  PortfolioGroup[]
+  subscriptions    Subscription[]
+  advisorLinks     AdvisorClient[]  @relation("AdvisorAccount")
+  clientLinks      AdvisorClient[]  @relation("ClientAccount")
+  importJobs       ImportJob[]
+  reports          Report[]
+
+  @@index([segment])
+}
+
+model User {
+  id             String    @id @default(cuid())
+  accountId      String
+  email          String    @unique
+  passwordHash   String?
+  fullName       String?
+  phone          String?
+  userType       UserType  @default(INVESTOR)
+  emailVerified  Boolean   @default(false)
+  // Password-reset-code flow observed in the login/reset UI
+  resetCode      String?
+  resetCodeExpiresAt DateTime?
+  lastLoginAt    DateTime?
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  account        Account   @relation(fields: [accountId], references: [id])
+  ownedPortfolios Portfolio[] @relation("PortfolioOwner")
+  emailImportRules EmailImportRule[]
+  referralsMade  Referral[] @relation("Referrer")
+
+  @@index([accountId])
+}
+
+// Advisor (wealth professional) → client relationship. A client is itself an
+// Account (with its own login) provisioned by the advisor.
+model AdvisorClient {
+  id              String   @id @default(cuid())
+  advisorAccountId String
+  clientAccountId String
+  displayName     String?  // label the advisor gives the client
+  category        String?  // category-wise / family-wise grouping
+  createdAt       DateTime @default(now())
+
+  advisorAccount  Account  @relation("AdvisorAccount", fields: [advisorAccountId], references: [id])
+  clientAccount   Account  @relation("ClientAccount", fields: [clientAccountId], references: [id])
+
+  @@unique([advisorAccountId, clientAccountId])
+  @@index([advisorAccountId])
+}
+
+model Plan {
+  id            String   @id @default(cuid())
+  code          String   @unique          // e.g. INVESTOR_PRO, WEALTH_PRO
+  name          String
+  segment       SubscriberSegment
+  priceInr      Decimal? @db.Decimal(12, 2)
+  billingPeriod String?                    // MONTHLY / ANNUAL
+  features      Json?                      // feature flags / limits
+  createdAt     DateTime @default(now())
+
+  subscriptions Subscription[]
+}
+
+model Subscription {
+  id          String   @id @default(cuid())
+  accountId   String
+  planId      String
+  status      String   @default("active") // active / trialing / expired / cancelled
+  startsAt    DateTime @default(now())
+  endsAt      DateTime?
+  createdAt   DateTime @default(now())
+
+  account     Account  @relation(fields: [accountId], references: [id])
+  plan        Plan     @relation(fields: [planId], references: [id])
+
+  @@index([accountId])
+}
+
+model Referral {
+  id           String   @id @default(cuid())
+  referrerId   String
+  refereeEmail String
+  code         String   @unique
+  status       String   @default("pending") // pending / signed_up / rewarded
+  createdAt    DateTime @default(now())
+
+  referrer     User     @relation("Referrer", fields: [referrerId], references: [id])
+
+  @@index([referrerId])
+}
+
+// ---------------------------------------------------------------------------
+// Portfolios & grouping
+// ---------------------------------------------------------------------------
+
+model Portfolio {
+  id           String   @id @default(cuid())
+  accountId    String
+  ownerId      String?
+  name         String
+  description  String?
+  baseCurrency String   @default("INR")
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  account      Account  @relation(fields: [accountId], references: [id])
+  owner        User?    @relation("PortfolioOwner", fields: [ownerId], references: [id])
+  holdings     Holding[]
+  transactions Transaction[]
+  fnoPositions FnoPosition[]
+  valuations   PortfolioValuation[]
+  groupLinks   PortfolioGroupMember[]
+  importJobs   ImportJob[]
+
+  @@index([accountId])
+}
+
+// Consolidated family / client grouping of multiple portfolios
+model PortfolioGroup {
+  id         String   @id @default(cuid())
+  accountId  String
+  name       String
+  createdAt  DateTime @default(now())
+
+  account    Account  @relation(fields: [accountId], references: [id])
+  members    PortfolioGroupMember[]
+
+  @@index([accountId])
+}
+
+model PortfolioGroupMember {
+  id          String   @id @default(cuid())
+  groupId     String
+  portfolioId String
+
+  group       PortfolioGroup @relation(fields: [groupId], references: [id])
+  portfolio   Portfolio      @relation(fields: [portfolioId], references: [id])
+
+  @@unique([groupId, portfolioId])
+}
+
+// ---------------------------------------------------------------------------
+// Instrument master, holdings, transactions
+// ---------------------------------------------------------------------------
+
+// Canonical security/instrument master shared across all portfolios.
+model Instrument {
+  id          String     @id @default(cuid())
+  assetClass  AssetClass
+  name        String
+  symbol      String?                       // ticker / trading symbol
+  isin        String?                       // ISIN where applicable (equity/MF/bond)
+  exchange    String?                       // NSE / BSE / MCX etc.
+  amcName     String?                       // for mutual funds
+  sector      String?
+  metadata    Json?                         // asset-class-specific extras
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+
+  holdings         Holding[]
+  transactions     Transaction[]
+  prices           Price[]
+  corporateActions CorporateAction[]
+  fnoPositions     FnoPosition[]
+  fixedDeposit     FixedDeposit?
+  npsAccount       NpsAccount?
+
+  @@unique([isin, exchange])
+  @@index([assetClass])
+  @@index([symbol])
+}
+
+// Current position of an instrument within a portfolio (derived from the ledger,
+// cached for fast valuation).
+model Holding {
+  id            String   @id @default(cuid())
+  portfolioId   String
+  instrumentId  String
+  quantity      Decimal  @db.Decimal(24, 6)
+  avgCost       Decimal  @db.Decimal(24, 6)
+  investedValue Decimal  @db.Decimal(24, 2)
+  currentPrice  Decimal? @db.Decimal(24, 6)
+  currentValue  Decimal? @db.Decimal(24, 2)
+  updatedAt     DateTime @updatedAt
+
+  portfolio     Portfolio  @relation(fields: [portfolioId], references: [id])
+  instrument    Instrument @relation(fields: [instrumentId], references: [id])
+
+  @@unique([portfolioId, instrumentId])
+  @@index([instrumentId])
+}
+
+// The canonical transaction ledger — the core of the product.
+model Transaction {
+  id            String   @id @default(cuid())
+  portfolioId   String
+  instrumentId  String?
+  type          TransactionType
+  tradeDate     DateTime
+  settlementDate DateTime?
+  quantity      Decimal? @db.Decimal(24, 6)
+  price         Decimal? @db.Decimal(24, 6)
+  amount        Decimal  @db.Decimal(24, 2)
+  brokerage     Decimal? @db.Decimal(24, 2)
+  taxes         Decimal? @db.Decimal(24, 2)
+  charges       Decimal? @db.Decimal(24, 2)
+  narration     String?
+  importJobId   String?                       // provenance: which file it came from
+  createdAt     DateTime @default(now())
+
+  portfolio     Portfolio   @relation(fields: [portfolioId], references: [id])
+  instrument    Instrument? @relation(fields: [instrumentId], references: [id])
+  importJob     ImportJob?  @relation(fields: [importJobId], references: [id])
+  capitalGains  CapitalGain[]
+
+  @@index([portfolioId, tradeDate])
+  @@index([instrumentId])
+  @@index([importJobId])
+}
+
+// F&O position tracking with mark-to-market
+model FnoPosition {
+  id           String   @id @default(cuid())
+  portfolioId  String
+  instrumentId String?
+  segment      FnoSegment
+  instrType    FnoInstrumentType
+  underlying   String
+  expiryDate   DateTime
+  strikePrice  Decimal? @db.Decimal(24, 6)
+  lots         Int
+  lotSize      Int
+  entryPrice   Decimal  @db.Decimal(24, 6)
+  markPrice    Decimal? @db.Decimal(24, 6)
+  realisedPnl  Decimal? @db.Decimal(24, 2)
+  unrealisedPnl Decimal? @db.Decimal(24, 2)
+  updatedAt    DateTime @updatedAt
+
+  portfolio    Portfolio   @relation(fields: [portfolioId], references: [id])
+  instrument   Instrument? @relation(fields: [instrumentId], references: [id])
+
+  @@index([portfolioId])
+  @@index([underlying, expiryDate])
+}
+
+// Asset-class extension: fixed-deposit specifics
+model FixedDeposit {
+  id            String   @id @default(cuid())
+  instrumentId  String   @unique
+  principal     Decimal  @db.Decimal(24, 2)
+  interestRate  Decimal  @db.Decimal(8, 4)
+  startDate     DateTime
+  maturityDate  DateTime
+  payoutType    String?  // cumulative / periodic
+  bankName      String?
+
+  instrument    Instrument @relation(fields: [instrumentId], references: [id])
+}
+
+// Asset-class extension: NPS (eNPS) specifics
+model NpsAccount {
+  id            String   @id @default(cuid())
+  instrumentId  String   @unique
+  pran          String?  // Permanent Retirement Account Number
+  tier          String?  // TIER_I / TIER_II
+  schemeName    String?
+
+  instrument    Instrument @relation(fields: [instrumentId], references: [id])
+}
+
+// ---------------------------------------------------------------------------
+// Market data, corporate actions, valuation
+// ---------------------------------------------------------------------------
+
+// Price / NAV history (equity 15-min delayed, MF daily NAV, bond prices, EOM).
+model Price {
+  id            String   @id @default(cuid())
+  instrumentId  String
+  priceDate     DateTime
+  price         Decimal  @db.Decimal(24, 6)
+  priceType     String   @default("CLOSE") // CLOSE / NAV / EOM / LIVE
+  source        String?
+  createdAt     DateTime @default(now())
+
+  instrument    Instrument @relation(fields: [instrumentId], references: [id])
+
+  @@unique([instrumentId, priceDate, priceType])
+  @@index([instrumentId, priceDate])
+}
+
+model CorporateAction {
+  id           String   @id @default(cuid())
+  instrumentId String
+  type         CorporateActionType
+  exDate       DateTime?
+  recordDate   DateTime?
+  ratioFrom    Decimal? @db.Decimal(18, 6)   // e.g. split/bonus ratio
+  ratioTo      Decimal? @db.Decimal(18, 6)
+  amountPerUnit Decimal? @db.Decimal(24, 6)  // e.g. dividend per share
+  notes        String?
+  createdAt    DateTime @default(now())
+
+  instrument   Instrument @relation(fields: [instrumentId], references: [id])
+
+  @@index([instrumentId, exDate])
+}
+
+// Historical end-of-month portfolio valuation snapshots
+model PortfolioValuation {
+  id            String   @id @default(cuid())
+  portfolioId   String
+  asOfDate      DateTime
+  investedValue Decimal  @db.Decimal(24, 2)
+  marketValue   Decimal  @db.Decimal(24, 2)
+  absoluteGain  Decimal  @db.Decimal(24, 2)
+  xirr          Decimal? @db.Decimal(10, 4)
+  createdAt     DateTime @default(now())
+
+  portfolio     Portfolio @relation(fields: [portfolioId], references: [id])
+
+  @@unique([portfolioId, asOfDate])
+  @@index([portfolioId, asOfDate])
+}
+
+// ---------------------------------------------------------------------------
+// Capital gains (India ITR)
+// ---------------------------------------------------------------------------
+
+model CapitalGain {
+  id             String   @id @default(cuid())
+  transactionId  String
+  term           CapitalGainTerm
+  buyDate        DateTime?
+  sellDate       DateTime?
+  quantity       Decimal  @db.Decimal(24, 6)
+  costOfAcquisition Decimal @db.Decimal(24, 2)
+  saleValue      Decimal  @db.Decimal(24, 2)
+  gainAmount     Decimal  @db.Decimal(24, 2)
+  grandfatheredValue Decimal? @db.Decimal(24, 2) // LTCG grandfathering (31-Jan-2018 FMV)
+  indexedCost    Decimal? @db.Decimal(24, 2)     // indexation benefit
+  financialYear  String?                          // e.g. "2024-25"
+  createdAt      DateTime @default(now())
+
+  transaction    Transaction @relation(fields: [transactionId], references: [id])
+
+  @@index([transactionId])
+  @@index([financialYear])
+}
+
+// ---------------------------------------------------------------------------
+// Import engine (the moat)
+// ---------------------------------------------------------------------------
+
+// Master list of the 700+ supported brokers/banks/RTAs/PMS and their file formats.
+model ImportSource {
+  id          String   @id @default(cuid())
+  name        String                          // e.g. "Zerodha", "CAMS", "HDFC Bank"
+  category    String                          // STOCKBROKER / MF_RTA / BANK / BACK_OFFICE / PMS / OTHER
+  fileFormats String[]                        // PDF / EXCEL / HTML / CSV / TXT / DBF
+  assetClasses AssetClass[]
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+
+  importJobs  ImportJob[]
+
+  @@unique([name, category])
+  @@index([category])
+}
+
+model ImportJob {
+  id            String   @id @default(cuid())
+  accountId     String
+  portfolioId   String?
+  sourceId      String?
+  channel       ImportChannel @default(MANUAL_UPLOAD)
+  fileName      String?
+  fileType      String?       // PDF / EXCEL / HTML / CSV / TXT / DBF
+  fileUrl       String?
+  status        ImportStatus  @default(PENDING)
+  rowsParsed    Int?
+  rowsImported  Int?
+  errorMessage  String?
+  createdAt     DateTime @default(now())
+  completedAt   DateTime?
+
+  account       Account       @relation(fields: [accountId], references: [id])
+  portfolio     Portfolio?    @relation(fields: [portfolioId], references: [id])
+  source        ImportSource? @relation(fields: [sourceId], references: [id])
+  transactions  Transaction[]
+
+  @@index([accountId])
+  @@index([status])
+}
+
+// Email-forwarding auto-import rule (user forwards trade files to a parse inbox).
+model EmailImportRule {
+  id            String   @id @default(cuid())
+  userId        String
+  forwardingAddress String                    // unique parse inbox address
+  fromFilter    String?                       // sender pattern to match
+  portfolioId   String?
+  isActive      Boolean  @default(true)
+  createdAt     DateTime @default(now())
+
+  user          User     @relation(fields: [userId], references: [id])
+
+  @@index([userId])
+}
+
+// ---------------------------------------------------------------------------
+// Reporting
+// ---------------------------------------------------------------------------
+
+// Generated report artifacts: Income, Due Dates, Transactions, Holding Period,
+// Asset Allocation, Capital Gains (ITR), Global/Advanced AUM.
+model Report {
+  id           String   @id @default(cuid())
+  accountId    String
+  type         String                          // INCOME / DUE_DATES / TRANSACTIONS / HOLDING_PERIOD / ASSET_ALLOCATION / CAPITAL_GAINS / AUM
+  scope        String?                         // portfolio / group / account / global
+  scopeId      String?
+  fromDate     DateTime?
+  toDate       DateTime?
+  format       String?                         // PDF / EXCEL / ITR / CLEARTAX / WINMAN / COMPUTAX
+  fileUrl      String?
+  createdAt    DateTime @default(now())
+
+  account      Account  @relation(fields: [accountId], references: [id])
+
+  @@index([accountId, type])
+}

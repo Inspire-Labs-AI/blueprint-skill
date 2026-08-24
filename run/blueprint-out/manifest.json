@@ -1,0 +1,1673 @@
+{
+  "target": {
+    "url": "https://www.mprofit.in/",
+    "auth": null
+  },
+  "recon": {
+    "screenshots": [
+      "blueprint-out/recon/shots/root.png",
+      "blueprint-out/recon/shots/features.png",
+      "blueprint-out/recon/shots/pricing.png",
+      "blueprint-out/recon/shots/import.png",
+      "blueprint-out/recon/shots/about.png",
+      "blueprint-out/recon/shots/buy.png",
+      "blueprint-out/recon/shots/login.png",
+      "blueprint-out/recon/shots/sign_up.png",
+      "blueprint-out/recon/shots/reviews.png",
+      "blueprint-out/recon/shots/blog.png",
+      "blueprint-out/recon/shots/terms_of_use.png",
+      "blueprint-out/recon/shots/privacy.png",
+      "blueprint-out/recon/shots/refer.png",
+      "blueprint-out/recon/shots/contact_us.png"
+    ],
+    "dom": "blueprint-out/recon/dom",
+    "har": null,
+    "routes": [
+      "https://www.mprofit.in/",
+      "https://www.mprofit.in/features",
+      "https://www.mprofit.in/pricing",
+      "https://www.mprofit.in/import",
+      "https://www.mprofit.in/about",
+      "https://www.mprofit.in/buy",
+      "https://www.mprofit.in/login",
+      "https://www.mprofit.in/sign-up",
+      "https://www.mprofit.in/reviews",
+      "https://www.mprofit.in/blog",
+      "https://www.mprofit.in/terms-of-use",
+      "https://www.mprofit.in/privacy",
+      "https://www.mprofit.in/refer",
+      "https://www.mprofit.in/contact-us"
+    ]
+  },
+  "intel": {
+    "feature_map": [
+      "Multi-asset portfolio tracking \u2014 Stocks, Mutual Funds, Traded Bonds, F&O (equity/currency/commodity), Fixed Deposits, NPS, PMS, AIF and other asset classes in one consolidated view",
+      "Auto-import engine \u2014 reads trade files across 5,000+ formats from 700+ brokers/banks/RTAs: broker contract notes & back-office files, MF CAS (CAMS/NSDL), MF RTA files (CAMS/Karvy/Franklin), eNPS (Karvy/NSDL), PMS & AIF statements; handles PDF, Excel, HTML, CSV, TXT, DBF",
+      "Email auto-import \u2014 user sets an email forwarding rule so incoming trade files are auto-forwarded and parsed into portfolios in near real-time with zero manual effort",
+      "Performance analytics \u2014 Absolute Gain and Annualised Return (XIRR) for any asset, asset class, portfolio or portfolio group; multi-level asset-allocation insights",
+      "Capital Gains reporting in Income-Tax-Return (ITR) format \u2014 long-term, short-term & intra-day for Stocks/MF/Bonds; applies LTCG grandfathering & indexation; unrealised CG estimation; exports compatible with ClearTax, Winman, CompuTax",
+      "Live market data \u2014 live price updates for Stocks/ETFs (15-min delayed), daily MF NAV and listed-bond prices, and corporate-action updates (dividend, bonus, split, merger, demerger); historical end-of-month valuations",
+      "F&O management \u2014 track equity/currency/commodity F&O positions, import digital contract notes & trade-book files, maintain mark-to-market records, track realised/unrealised P&L",
+      "Multiple portfolios & portfolio groups \u2014 investors maintain individual portfolios and group them for consolidated family holdings; advisors keep client investments in category-wise / family-wise portfolios",
+      "Wealth-professional / multi-tenant features \u2014 provide MProfit logins to clients, client self-service portals on web & mobile, global AUM reports, white-label logo branding",
+      "Reports suite \u2014 Income, Due Dates, Transactions, Holding Period, asset allocation, and global/advanced AUM reports",
+      "Cross-platform access \u2014 Web application (MProfit Cloud) plus native Android (com.mprmobile) and iOS (id1418536415) apps",
+      "Marketing & conversion surface \u2014 features, pricing (separate Investor vs Wealth-Professional plans), import/broker search, reviews (500+), blog, referral program, buy/subscribe & login flows"
+    ],
+    "tech_stack": {
+      "marketing_site": {
+        "framework": "Gatsby 2.23.3 (React static-site generator)",
+        "evidence": "meta generator 'Gatsby 2.23.3'; /page-data/*/page-data.json; component---src-pages-*.js chunks; webpack-runtime/framework/commons bundles; app-data.json",
+        "rendering": "Static pre-rendered HTML + client-side React hydration; per-route code-split page-data JSON",
+        "styling": "Bootstrap + Font Awesome + Google Fonts (referenced)",
+        "confidence": "observed"
+      },
+      "cms": {
+        "name": "Sanity.io (headless CMS)",
+        "evidence": "cdn.sanity.io preconnect present on every page; likely source for blog and marketing copy at build time",
+        "confidence": "observed"
+      },
+      "third_party": {
+        "support": "Freshworks / Freshdesk widget (ind-widget.freshworks.com; help.mprofit.in help center)",
+        "reviews_widget": "EmbedSocial (embedsocial.com iframe-lightbox / universal-popup)",
+        "analytics": "Google Analytics + Google Tag Manager (gtag), Microsoft Clarity (clarity.ms)",
+        "advertising": "Facebook Pixel (connect.facebook.net/fbevents.js), Google Ads / DoubleClick (googleads.g.doubleclick.net)",
+        "assets": "files.mprofit.in (asset/download host); careers.mprofit.in (careers)",
+        "confidence": "observed"
+      },
+      "product_app": {
+        "name": "MProfit Cloud (authenticated web app, separate from marketing SSG)",
+        "note": "Login/subscribe forms are embedded ('Login to your MProfit account', password reset with reset code); the portfolio product itself is a separate SPA/back-end not captured in recon (no HAR, no authorized session)",
+        "confidence": "inferred"
+      },
+      "inferred_backend": {
+        "import_parser_engine": "Proprietary multi-format parser normalizing 5,000+ file layouts (PDF/Excel/HTML/CSV/TXT/DBF) into a canonical transaction ledger \u2014 the core IP",
+        "market_data_pipeline": "Ingestion of live equity/ETF prices (15-min delay), daily MF NAV & bond prices, and corporate-action feeds",
+        "compute_engines": "XIRR / absolute-gain / asset-allocation engine and India-specific capital-gains engine (ITR format, LTCG grandfathering, indexation)",
+        "data_platform": "Multi-tenant relational store for accounts, portfolios/groups, holdings, transactions, instruments/prices, corporate actions, and advisor\u2192client hierarchy",
+        "auth": "Email/password auth with password-reset-code flow; advisor-provisioned client logins",
+        "confidence": "inferred"
+      }
+    },
+    "priorities": [
+      "1. Canonical multi-asset data model + import parser engine \u2014 transaction ledger for Stocks/MF/Bonds/F&O/FD/NPS/PMS/AIF plus broker/RTA/CAS file ingestion (the highest-value, hardest-to-copy core)",
+      "2. Portfolio valuation & market-data layer \u2014 price/NAV feed integration, corporate-action handling, live and historical end-of-month valuations",
+      "3. Analytics engines \u2014 XIRR/absolute-gain/asset-allocation and India capital-gains (ITR format, LTCG grandfathering, indexation) reporting",
+      "4. Multi-tenant auth & advisor\u2192client hierarchy \u2014 accounts, portfolios, portfolio groups, client provisioning, white-label branding",
+      "5. Reporting & app surfaces \u2014 web (MProfit Cloud) reports UI plus Android/iOS parity; email auto-import forwarding pipeline",
+      "6. Marketing/conversion site \u2014 Gatsby+Sanity clone (features, pricing, import search, reviews, referral, login/buy) \u2014 low effort, high polish"
+    ],
+    "moat": "MProfit's defensibility is its proprietary import engine: it reliably parses and normalizes 5,000+ file formats from 700+ Indian brokers, banks, RTAs and PMS/AIF providers (contract notes, back-office files, MF CAS/RTA, eNPS) across PDF/Excel/HTML/CSV/TXT/DBF into one clean transaction ledger. That breadth requires continuous, labor-intensive maintenance of hundreds of Indian-market-specific parsers, layered on top of India-specific tax logic (ITR-format capital gains, LTCG grandfathering, indexation, tax-software exports). Combined with distribution advantages \u2014 200,000+ signups, presence in 300+ cities, deep advisor/CA/family-office relationships, and Zerodha Rainmatter (+Enam) backing \u2014 the aggregation breadth and localized compliance are far harder to replicate than the UI itself.",
+    "build_prompt": "Build an India-focused multi-asset portfolio management SaaS ('MProfit clone'). Core: a canonical transaction ledger supporting Stocks, Mutual Funds, Traded Bonds, F&O (equity/currency/commodity), Fixed Deposits, NPS, PMS and AIF, fed by an import engine that parses broker contract notes & back-office files, MF CAS (CAMS/NSDL), MF RTA files (CAMS/Karvy/Franklin), eNPS and PMS/AIF statements across PDF/Excel/HTML/CSV/TXT/DBF, plus an email-forwarding auto-import path. Add a market-data layer (live 15-min-delayed equity/ETF prices, daily MF NAV & bond prices, corporate actions: dividend/bonus/split/merger/demerger) and historical end-of-month valuations. Provide analytics: XIRR, absolute & annualised returns, multi-level asset allocation, and India capital-gains reports in ITR format (short/long/intra-day, LTCG grandfathering, indexation, exports for ClearTax/Winman/CompuTax). Support multiple portfolios and portfolio groups for consolidated family/client holdings, and a wealth-professional multi-tenant mode where advisors/CAs/family offices provision client logins with white-label branding and global AUM reports. Ship a React web app (MProfit Cloud) with email/password auth (reset-code flow) plus Android & iOS apps. Marketing site: Gatsby + Sanity CMS with features, pricing (separate Investor vs Wealth-Professional plans), broker-import search, reviews, referral program, and buy/login flows; integrate Freshdesk support, EmbedSocial reviews, GA/GTM, Microsoft Clarity and Facebook Pixel."
+  },
+  "database": {
+    "mode": "inference",
+    "confidence": "inferred",
+    "note": "Schema inferred from UI screenshots + DOM (Claude vision) under blueprint-out/recon/. target.auth.authorized != true and HAR is null, so no live DB was connected or replicated. replicated=false.",
+    "replicated": false,
+    "schema_prisma": "blueprint-out/db/schema.prisma",
+    "schema_sql": "blueprint-out/db/schema.sql",
+    "er_diagram": "blueprint-out/db/er.mmd",
+    "tables": [
+      {
+        "name": "account",
+        "confidence": "inferred",
+        "purpose": "Billing/tenant boundary; investor account or wealth-professional multi-tenant workspace with white-label branding"
+      },
+      {
+        "name": "app_user",
+        "confidence": "inferred",
+        "purpose": "Login identity (email/password, reset-code flow); INVESTOR vs WEALTH_PROFESSIONAL"
+      },
+      {
+        "name": "advisor_client",
+        "confidence": "inferred",
+        "purpose": "Advisor\u2192client link; category-wise/family-wise client provisioning"
+      },
+      {
+        "name": "plan",
+        "confidence": "inferred",
+        "purpose": "Subscription plans, separate Investor vs Wealth-Professional segments"
+      },
+      {
+        "name": "subscription",
+        "confidence": "inferred",
+        "purpose": "Account subscription/billing state"
+      },
+      {
+        "name": "referral",
+        "confidence": "inferred",
+        "purpose": "Referral program (refer page)"
+      },
+      {
+        "name": "portfolio",
+        "confidence": "inferred",
+        "purpose": "Individual portfolio owned by an account/user"
+      },
+      {
+        "name": "portfolio_group",
+        "confidence": "inferred",
+        "purpose": "Consolidated family/client grouping of portfolios"
+      },
+      {
+        "name": "portfolio_group_member",
+        "confidence": "inferred",
+        "purpose": "Join: portfolios in a group"
+      },
+      {
+        "name": "instrument",
+        "confidence": "inferred",
+        "purpose": "Canonical security master across all asset classes (ISIN/symbol/exchange/AMC)"
+      },
+      {
+        "name": "holding",
+        "confidence": "inferred",
+        "purpose": "Cached per-portfolio position (qty, avg cost, current value)"
+      },
+      {
+        "name": "transaction",
+        "confidence": "inferred",
+        "purpose": "Canonical multi-asset transaction ledger (buy/sell/dividend/corporate actions/charges) \u2014 core IP"
+      },
+      {
+        "name": "fno_position",
+        "confidence": "inferred",
+        "purpose": "F&O positions (equity/currency/commodity) with mark-to-market and realised/unrealised P&L"
+      },
+      {
+        "name": "fixed_deposit",
+        "confidence": "inferred",
+        "purpose": "FD extension (principal, rate, maturity)"
+      },
+      {
+        "name": "nps_account",
+        "confidence": "inferred",
+        "purpose": "NPS/eNPS extension (PRAN, tier, scheme)"
+      },
+      {
+        "name": "price",
+        "confidence": "inferred",
+        "purpose": "Price/NAV history (live 15-min-delayed equity, daily MF NAV, bond prices, EOM valuations)"
+      },
+      {
+        "name": "corporate_action",
+        "confidence": "inferred",
+        "purpose": "Dividend/bonus/split/merger/demerger/rights/buyback events"
+      },
+      {
+        "name": "portfolio_valuation",
+        "confidence": "inferred",
+        "purpose": "Historical end-of-month valuation snapshots with absolute gain & XIRR"
+      },
+      {
+        "name": "capital_gain",
+        "confidence": "inferred",
+        "purpose": "India ITR capital gains (STCG/LTCG/intra-day, LTCG grandfathering, indexation)"
+      },
+      {
+        "name": "import_source",
+        "confidence": "inferred",
+        "purpose": "Master of 700+ supported brokers/banks/RTAs/PMS and their file formats"
+      },
+      {
+        "name": "import_job",
+        "confidence": "inferred",
+        "purpose": "Import run (manual upload / email-forward / broker sync) with parse status"
+      },
+      {
+        "name": "email_import_rule",
+        "confidence": "inferred",
+        "purpose": "Email-forwarding auto-import rule (parse inbox address)"
+      },
+      {
+        "name": "report",
+        "confidence": "inferred",
+        "purpose": "Generated reports: Income, Due Dates, Transactions, Holding Period, Asset Allocation, Capital Gains (ITR), AUM"
+      }
+    ],
+    "entities": 23,
+    "generatedBy": "bp-screenshot2sql (native Claude vision)",
+    "generatedAt": "2026-08-24"
+  },
+  "api": {
+    "mode": "inference",
+    "confidence": "inferred",
+    "live": false,
+    "note": "No HAR and target.auth.authorized != true, so reverse-api-engineer/Integuru could not be run against real traffic. Endpoints, shapes and auth flow are LLM-inferred from recon (screenshots + DOM under blueprint-out/recon/) and the intel.feature_map + database (Prisma) slices. The product API ('MProfit Cloud') is a separate app from the Gatsby+Sanity marketing SSG; the marketing site has no first-party API. Every endpoint is confidence:'inferred'.",
+    "language": "typescript",
+    "client_path": "blueprint-out/api/client.ts",
+    "base_url": "https://api.mprofit.in",
+    "conventions": {
+      "protocol": "REST/JSON",
+      "versioning": "URL prefix /v1",
+      "money": "decimal-as-string (mirrors Prisma Decimal)",
+      "dates": "ISO-8601 strings",
+      "pagination": "cursor-based { data, nextCursor }",
+      "tenancy": "scoped to authed account; advisor can switch client context",
+      "errors": "non-2xx -> MProfitApiError(status, body)"
+    },
+    "auth_flow": {
+      "type": "email/password with JWT/session cookie",
+      "confidence": "inferred",
+      "steps": [
+        "POST /v1/auth/signup (userType INVESTOR|WEALTH_PROFESSIONAL, optional referralCode) -> Session{token,user,account}",
+        "POST /v1/auth/login {email,password} -> Session",
+        "POST /v1/auth/password/reset-request {email} -> emails a reset code (reset-code flow seen in login UI)",
+        "POST /v1/auth/password/reset-confirm {email,resetCode,newPassword} -> Session",
+        "POST /v1/auth/verify-email {token}",
+        "GET /v1/auth/me -> {user,account}; POST /v1/auth/refresh; POST /v1/auth/logout",
+        "Wealth-professional: POST /v1/advisor/clients/{clientAccountId}/session to assume a client tenant context"
+      ]
+    },
+    "endpoint_groups": [
+      {
+        "name": "auth",
+        "confidence": "inferred",
+        "count": 8,
+        "maps_to": [
+          "User",
+          "Account"
+        ]
+      },
+      {
+        "name": "account",
+        "confidence": "inferred",
+        "count": 4,
+        "maps_to": [
+          "Account",
+          "User"
+        ]
+      },
+      {
+        "name": "billing",
+        "confidence": "inferred",
+        "count": 6,
+        "maps_to": [
+          "Plan",
+          "Subscription",
+          "Referral"
+        ]
+      },
+      {
+        "name": "advisor",
+        "confidence": "inferred",
+        "count": 6,
+        "maps_to": [
+          "AdvisorClient",
+          "Account"
+        ]
+      },
+      {
+        "name": "portfolios",
+        "confidence": "inferred",
+        "count": 7,
+        "maps_to": [
+          "Portfolio",
+          "Holding",
+          "PortfolioValuation"
+        ]
+      },
+      {
+        "name": "groups",
+        "confidence": "inferred",
+        "count": 7,
+        "maps_to": [
+          "PortfolioGroup",
+          "PortfolioGroupMember"
+        ]
+      },
+      {
+        "name": "holdings",
+        "confidence": "inferred",
+        "count": 2,
+        "maps_to": [
+          "Holding",
+          "Instrument"
+        ]
+      },
+      {
+        "name": "transactions",
+        "confidence": "inferred",
+        "count": 6,
+        "maps_to": [
+          "Transaction"
+        ]
+      },
+      {
+        "name": "fno",
+        "confidence": "inferred",
+        "count": 4,
+        "maps_to": [
+          "FnoPosition"
+        ]
+      },
+      {
+        "name": "instruments",
+        "confidence": "inferred",
+        "count": 7,
+        "maps_to": [
+          "Instrument",
+          "FixedDeposit",
+          "NpsAccount"
+        ]
+      },
+      {
+        "name": "marketData",
+        "confidence": "inferred",
+        "count": 4,
+        "maps_to": [
+          "Price",
+          "CorporateAction"
+        ]
+      },
+      {
+        "name": "imports",
+        "confidence": "inferred",
+        "count": 10,
+        "maps_to": [
+          "ImportSource",
+          "ImportJob",
+          "EmailImportRule",
+          "Transaction"
+        ]
+      },
+      {
+        "name": "analytics",
+        "confidence": "inferred",
+        "count": 3,
+        "maps_to": [
+          "PortfolioValuation",
+          "Holding",
+          "Transaction"
+        ]
+      },
+      {
+        "name": "capitalGains",
+        "confidence": "inferred",
+        "count": 3,
+        "maps_to": [
+          "CapitalGain",
+          "Report"
+        ]
+      },
+      {
+        "name": "reports",
+        "confidence": "inferred",
+        "count": 4,
+        "maps_to": [
+          "Report"
+        ]
+      }
+    ],
+    "endpoints": [
+      {
+        "method": "POST",
+        "path": "/v1/auth/signup",
+        "group": "auth",
+        "confidence": "inferred",
+        "summary": "Register investor or wealth professional; returns session"
+      },
+      {
+        "method": "POST",
+        "path": "/v1/auth/login",
+        "group": "auth",
+        "confidence": "inferred",
+        "summary": "Email/password login"
+      },
+      {
+        "method": "POST",
+        "path": "/v1/auth/logout",
+        "group": "auth",
+        "confidence": "inferred",
+        "summary": "Invalidate session"
+      },
+      {
+        "method": "POST",
+        "path": "/v1/auth/refresh",
+        "group": "auth",
+        "confidence": "inferred",
+        "summary": "Refresh session token"
+      },
+      {
+        "method": "GET",
+        "path": "/v1/auth/me",
+        "group": "auth",
+        "confidence": "inferred",
+        "summary": "Current user + account"
+      },
+      {
+        "method": "POST",
+        "path": "/v1/auth/verify-email",
+        "group": "auth",
+        "confidence": "inferred",
+        "summary": "Confirm email via token"
+      },
+      {
+        "method": "POST",
+        "path": "/v1/auth/password/reset-request",
+        "group": "auth",
+        "confidence": "inferred",
+        "summary": "Send password reset code"
+      },
+      {
+        "method": "POST",
+        "path": "/v1/auth/password/reset-confirm",
+        "group": "auth",
+        "confidence": "inferred",
+        "summary": "Confirm reset with code + new password"
+      },
+      {
+        "method": "GET",
+        "path": "/v1/account",
+        "group": "account",
+        "confidence": "inferred",
+        "summary": "Get tenant/account + branding"
+      },
+      {
+        "method": "PATCH",
+        "path": "/v1/account",
+        "group": "account",
+        "confidence": "inferred",
+        "summary": "Update account name + white-label branding"
+      },
+      {
+        "method": "GET",
+        "path": "/v1/account/users",
+        "group": "account",
+        "confidence": "inferred",
+        "summary": "List users in the account"
+      },
+      {
+        "method": "POST",
+        "path": "/v1/account/users",
+        "group": "account",
+        "confidence": "inferred",
+        "summary": "Invite a user to the account"
+      },
+      {
+        "method": "GET",
+        "path": "/v1/plans",
+        "group": "billing",
+        "confidence": "inferred",
+        "summary": "List plans (Investor vs Wealth-Professional segment)"
+      },
+      {
+        "method": "GET",
+        "path": "/v1/subscription",
+        "group": "billing",
+        "confidence": "inferred",
+        "summary": "Current subscription state"
+      },
+      {
+        "method": "POST",
+        "path": "/v1/subscription",
+        "group": "billing",
+        "confidence": "inferred",
+        "summary": "Subscribe to a plan"
+      },
+      {
+        "method": "POST",
+        "path": "/v1/subscription/cancel",
+        "group": "billing",
+        "confidence": "inferred",
+        "summary": "Cancel subscription"
+      },
+      {
+        "method": "GET",
+        "path": "/v1/referrals",
+        "group": "billing",
+        "confidence": "inferred",
+        "summary": "List referrals made"
+      },
+      {
+        "method": "POST",
+        "path": "/v1/referrals",
+        "group": "billing",
+        "confidence": "inferred",
+        "summary": "Create a referral (refer program)"
+      },
+      {
+        "method": "GET",
+        "path": "/v1/advisor/clients",
+        "group": "advisor",
+        "confidence": "inferred",
+        "summary": "List advisor's client accounts (category/family-wise)"
+      },
+      {
+        "method": "POST",
+        "path": "/v1/advisor/clients",
+        "group": "advisor",
+        "confidence": "inferred",
+        "summary": "Provision a client login"
+      },
+      {
+        "method": "PATCH",
+        "path": "/v1/advisor/clients/{id}",
+        "group": "advisor",
+        "confidence": "inferred",
+        "summary": "Update client display name/category"
+      },
+      {
+        "method": "DELETE",
+        "path": "/v1/advisor/clients/{id}",
+        "group": "advisor",
+        "confidence": "inferred",
+        "summary": "Unlink a client"
+      },
+      {
+        "method": "POST",
+        "path": "/v1/advisor/clients/{clientAccountId}/session",
+        "group": "advisor",
+        "confidence": "inferred",
+        "summary": "Assume client tenant context"
+      },
+      {
+        "method": "GET",
+        "path": "/v1/advisor/aum",
+        "group": "advisor",
+        "confidence": "inferred",
+        "summary": "Global AUM report across all clients"
+      },
+      {
+        "method": "GET",
+        "path": "/v1/portfolios",
+        "group": "portfolios",
+        "confidence": "inferred",
+        "summary": "List portfolios"
+      },
+      {
+        "method": "POST",
+        "path": "/v1/portfolios",
+        "group": "portfolios",
+        "confidence": "inferred",
+        "summary": "Create a portfolio"
+      },
+      {
+        "method": "GET",
+        "path": "/v1/portfolios/{id}",
+        "group": "portfolios",
+        "confidence": "inferred",
+        "summary": "Get portfolio"
+      },
+      {
+        "method": "PATCH",
+        "path": "/v1/portfolios/{id}",
+        "group": "portfolios",
+        "confidence": "inferred",
+        "summary": "Update portfolio"
+      },
+      {
+        "method": "DELETE",
+        "path": "/v1/portfolios/{id}",
+        "group": "portfolios",
+        "confidence": "inferred",
+        "summary": "Delete portfolio"
+      },
+      {
+        "method": "GET",
+        "path": "/v1/portfolios/{id}/holdings",
+        "group": "portfolios",
+        "confidence": "inferred",
+        "summary": "Holdings for a portfolio"
+      },
+      {
+        "method": "GET",
+        "path": "/v1/portfolios/{id}/valuations",
+        "group": "portfolios",
+        "confidence": "inferred",
+        "summary": "EOM valuation history"
+      },
+      {
+        "method": "GET",
+        "path": "/v1/portfolio-groups",
+        "group": "groups",
+        "confidence": "inferred",
+        "summary": "List portfolio groups"
+      },
+      {
+        "method": "POST",
+        "path": "/v1/portfolio-groups",
+        "group": "groups",
+        "confidence": "inferred",
+        "summary": "Create a consolidated family/client group"
+      },
+      {
+        "method": "GET",
+        "path": "/v1/portfolio-groups/{id}",
+        "group": "groups",
+        "confidence": "inferred",
+        "summary": "Get group"
+      },
+      {
+        "method": "PATCH",
+        "path": "/v1/portfolio-groups/{id}",
+        "group": "groups",
+        "confidence": "inferred",
+        "summary": "Rename group"
+      },
+      {
+        "method": "DELETE",
+        "path": "/v1/portfolio-groups/{id}",
+        "group": "groups",
+        "confidence": "inferred",
+        "summary": "Delete group"
+      },
+      {
+        "method": "POST",
+        "path": "/v1/portfolio-groups/{id}/members",
+        "group": "groups",
+        "confidence": "inferred",
+        "summary": "Add portfolios to group"
+      },
+      {
+        "method": "DELETE",
+        "path": "/v1/portfolio-groups/{id}/members/{portfolioId}",
+        "group": "groups",
+        "confidence": "inferred",
+        "summary": "Remove portfolio from group"
+      },
+      {
+        "method": "GET",
+        "path": "/v1/holdings",
+        "group": "holdings",
+        "confidence": "inferred",
+        "summary": "List holdings across portfolios/group/asset class"
+      },
+      {
+        "method": "GET",
+        "path": "/v1/holdings/{id}",
+        "group": "holdings",
+        "confidence": "inferred",
+        "summary": "Get a holding"
+      },
+      {
+        "method": "GET",
+        "path": "/v1/transactions",
+        "group": "transactions",
+        "confidence": "inferred",
+        "summary": "List/filter ledger transactions"
+      },
+      {
+        "method": "POST",
+        "path": "/v1/transactions",
+        "group": "transactions",
+        "confidence": "inferred",
+        "summary": "Create a transaction"
+      },
+      {
+        "method": "POST",
+        "path": "/v1/transactions/bulk",
+        "group": "transactions",
+        "confidence": "inferred",
+        "summary": "Bulk create (import commit path)"
+      },
+      {
+        "method": "GET",
+        "path": "/v1/transactions/{id}",
+        "group": "transactions",
+        "confidence": "inferred",
+        "summary": "Get a transaction"
+      },
+      {
+        "method": "PATCH",
+        "path": "/v1/transactions/{id}",
+        "group": "transactions",
+        "confidence": "inferred",
+        "summary": "Edit a transaction"
+      },
+      {
+        "method": "DELETE",
+        "path": "/v1/transactions/{id}",
+        "group": "transactions",
+        "confidence": "inferred",
+        "summary": "Delete a transaction"
+      },
+      {
+        "method": "GET",
+        "path": "/v1/fno-positions",
+        "group": "fno",
+        "confidence": "inferred",
+        "summary": "List F&O positions"
+      },
+      {
+        "method": "POST",
+        "path": "/v1/fno-positions",
+        "group": "fno",
+        "confidence": "inferred",
+        "summary": "Create F&O position"
+      },
+      {
+        "method": "PATCH",
+        "path": "/v1/fno-positions/{id}",
+        "group": "fno",
+        "confidence": "inferred",
+        "summary": "Update / mark-to-market"
+      },
+      {
+        "method": "DELETE",
+        "path": "/v1/fno-positions/{id}",
+        "group": "fno",
+        "confidence": "inferred",
+        "summary": "Delete F&O position"
+      },
+      {
+        "method": "GET",
+        "path": "/v1/instruments",
+        "group": "instruments",
+        "confidence": "inferred",
+        "summary": "Search security master"
+      },
+      {
+        "method": "GET",
+        "path": "/v1/instruments/{id}",
+        "group": "instruments",
+        "confidence": "inferred",
+        "summary": "Get instrument"
+      },
+      {
+        "method": "POST",
+        "path": "/v1/instruments",
+        "group": "instruments",
+        "confidence": "inferred",
+        "summary": "Create instrument (custom asset)"
+      },
+      {
+        "method": "GET",
+        "path": "/v1/instruments/{id}/fixed-deposit",
+        "group": "instruments",
+        "confidence": "inferred",
+        "summary": "FD extension"
+      },
+      {
+        "method": "PUT",
+        "path": "/v1/instruments/{id}/fixed-deposit",
+        "group": "instruments",
+        "confidence": "inferred",
+        "summary": "Upsert FD extension"
+      },
+      {
+        "method": "GET",
+        "path": "/v1/instruments/{id}/nps",
+        "group": "instruments",
+        "confidence": "inferred",
+        "summary": "NPS extension"
+      },
+      {
+        "method": "PUT",
+        "path": "/v1/instruments/{id}/nps",
+        "group": "instruments",
+        "confidence": "inferred",
+        "summary": "Upsert NPS extension"
+      },
+      {
+        "method": "GET",
+        "path": "/v1/instruments/{id}/prices",
+        "group": "marketData",
+        "confidence": "inferred",
+        "summary": "Price/NAV history"
+      },
+      {
+        "method": "GET",
+        "path": "/v1/instruments/{id}/prices/latest",
+        "group": "marketData",
+        "confidence": "inferred",
+        "summary": "Latest price (15-min delayed equity / daily NAV)"
+      },
+      {
+        "method": "GET",
+        "path": "/v1/market-data/quotes",
+        "group": "marketData",
+        "confidence": "inferred",
+        "summary": "Batch quotes for instrument ids"
+      },
+      {
+        "method": "GET",
+        "path": "/v1/instruments/{id}/corporate-actions",
+        "group": "marketData",
+        "confidence": "inferred",
+        "summary": "Corporate actions feed"
+      },
+      {
+        "method": "GET",
+        "path": "/v1/import/sources",
+        "group": "imports",
+        "confidence": "inferred",
+        "summary": "Search 700+ brokers/banks/RTAs/PMS"
+      },
+      {
+        "method": "GET",
+        "path": "/v1/import/jobs",
+        "group": "imports",
+        "confidence": "inferred",
+        "summary": "List import jobs"
+      },
+      {
+        "method": "GET",
+        "path": "/v1/import/jobs/{id}",
+        "group": "imports",
+        "confidence": "inferred",
+        "summary": "Get import job + parse status"
+      },
+      {
+        "method": "POST",
+        "path": "/v1/import/jobs",
+        "group": "imports",
+        "confidence": "inferred",
+        "summary": "Multipart upload of trade file -> parse job"
+      },
+      {
+        "method": "POST",
+        "path": "/v1/import/jobs/{id}/commit",
+        "group": "imports",
+        "confidence": "inferred",
+        "summary": "Commit parsed rows into ledger"
+      },
+      {
+        "method": "POST",
+        "path": "/v1/import/jobs/{id}/retry",
+        "group": "imports",
+        "confidence": "inferred",
+        "summary": "Retry a failed parse"
+      },
+      {
+        "method": "GET",
+        "path": "/v1/import/email-rules",
+        "group": "imports",
+        "confidence": "inferred",
+        "summary": "List email auto-import rules"
+      },
+      {
+        "method": "POST",
+        "path": "/v1/import/email-rules",
+        "group": "imports",
+        "confidence": "inferred",
+        "summary": "Create forwarding rule (parse inbox)"
+      },
+      {
+        "method": "PATCH",
+        "path": "/v1/import/email-rules/{id}",
+        "group": "imports",
+        "confidence": "inferred",
+        "summary": "Update forwarding rule"
+      },
+      {
+        "method": "DELETE",
+        "path": "/v1/import/email-rules/{id}",
+        "group": "imports",
+        "confidence": "inferred",
+        "summary": "Delete forwarding rule"
+      },
+      {
+        "method": "GET",
+        "path": "/v1/analytics/performance",
+        "group": "analytics",
+        "confidence": "inferred",
+        "summary": "Absolute gain + XIRR for scope"
+      },
+      {
+        "method": "GET",
+        "path": "/v1/analytics/allocation",
+        "group": "analytics",
+        "confidence": "inferred",
+        "summary": "Multi-level asset allocation"
+      },
+      {
+        "method": "GET",
+        "path": "/v1/analytics/xirr",
+        "group": "analytics",
+        "confidence": "inferred",
+        "summary": "Annualised return (XIRR) for scope"
+      },
+      {
+        "method": "GET",
+        "path": "/v1/capital-gains",
+        "group": "capitalGains",
+        "confidence": "inferred",
+        "summary": "List capital gains (ITR, STCG/LTCG/intra-day)"
+      },
+      {
+        "method": "POST",
+        "path": "/v1/capital-gains/compute",
+        "group": "capitalGains",
+        "confidence": "inferred",
+        "summary": "Compute CG for scope + FY (grandfathering/indexation)"
+      },
+      {
+        "method": "POST",
+        "path": "/v1/capital-gains/export",
+        "group": "capitalGains",
+        "confidence": "inferred",
+        "summary": "Export ITR/ClearTax/Winman/CompuTax file"
+      },
+      {
+        "method": "GET",
+        "path": "/v1/reports",
+        "group": "reports",
+        "confidence": "inferred",
+        "summary": "List generated reports"
+      },
+      {
+        "method": "POST",
+        "path": "/v1/reports",
+        "group": "reports",
+        "confidence": "inferred",
+        "summary": "Generate a report (Income/Due Dates/Transactions/Holding Period/Allocation/CG/AUM)"
+      },
+      {
+        "method": "GET",
+        "path": "/v1/reports/{id}",
+        "group": "reports",
+        "confidence": "inferred",
+        "summary": "Get report metadata"
+      },
+      {
+        "method": "GET",
+        "path": "/v1/reports/{id}/download",
+        "group": "reports",
+        "confidence": "inferred",
+        "summary": "Signed download URL"
+      }
+    ],
+    "endpoint_count": 81,
+    "generatedBy": "bp-reverse-api (LLM inference path \u2014 no HAR)",
+    "generatedAt": "2026-08-24"
+  },
+  "blueprint": "run/blueprint-out/blueprint.md",
+  "slices": {
+    "overview": "done",
+    "feature_map": "done",
+    "tech_stack": "done",
+    "data_model": "done",
+    "api_surface": "done",
+    "dataflow": "done",
+    "clone_plan": "done",
+    "stage_matrix": "done",
+    "risks_gaps": "done"
+  },
+  "evidence": {
+    "screenshots": 14,
+    "dom_pages": 14,
+    "har": null
+  },
+  "status": {
+    "recon": "done",
+    "intel": "done",
+    "database": "done",
+    "api": "done",
+    "dataflow": "done",
+    "frontend": "done",
+    "assembly": "pending"
+  },
+  "generatedBy": "bp-blueprint synthesis stage",
+  "generatedAt": "2026-08-24",
+  "dataflow": {
+    "mode": "inference",
+    "confidence": "inferred",
+    "note": "Fusion map correlating each UI surface -> data_fields -> serving API endpoint -> backing DB table(s). Marketing surfaces (login/buy/sign_up/pricing/import/refer/reviews/blog/contact) have UI observed in recon DOM+screenshots (ui_evidence='observed'), but every API/DB link is confidence:'inferred' (no HAR, target.auth.authorized != true). Product app (MProfit Cloud) surfaces are entirely inferred (ui_evidence='inferred') \u2014 the authenticated SPA was not in recon. Carries the inherited api_surface + data_model 'inferred' confidence throughout.",
+    "map": [
+      {
+        "ui_element": "Login form (login & buy pages)",
+        "screen": "login / buy",
+        "data_fields": [
+          "email",
+          "password"
+        ],
+        "api_endpoint": "POST /v1/auth/login",
+        "db_tables": [
+          "app_user",
+          "account"
+        ],
+        "tag": "inferred",
+        "ui_evidence": "observed",
+        "note": "Form observed in DOM (action='login', input name=email, submit 'Continue'); backing auth API/DB inferred (no HAR)."
+      },
+      {
+        "ui_element": "Reset-password modal",
+        "screen": "login / buy",
+        "data_fields": [
+          "resetPasswordEmail",
+          "resetCode",
+          "newPassword"
+        ],
+        "api_endpoint": "POST /v1/auth/password/reset-request -> POST /v1/auth/password/reset-confirm",
+        "db_tables": [
+          "app_user"
+        ],
+        "tag": "inferred",
+        "ui_evidence": "observed",
+        "note": "Reset-code modal observed in DOM ('Reset my password', name=resetPasswordEmail); reset-code flow drives inferred auth endpoints."
+      },
+      {
+        "ui_element": "Sign-up CTA / registration",
+        "screen": "sign_up",
+        "data_fields": [
+          "email",
+          "password",
+          "userType(INVESTOR|WEALTH_PROFESSIONAL)",
+          "referralCode?"
+        ],
+        "api_endpoint": "POST /v1/auth/signup",
+        "db_tables": [
+          "app_user",
+          "account"
+        ],
+        "tag": "inferred",
+        "ui_evidence": "observed",
+        "note": "Sign-up nav/CTA observed; registration payload + tenancy split inferred from feature_map."
+      },
+      {
+        "ui_element": "Pricing plan cards (Investor vs Wealth-Professional)",
+        "screen": "pricing",
+        "data_fields": [
+          "planName",
+          "segment",
+          "price",
+          "billingPeriod",
+          "features[]"
+        ],
+        "api_endpoint": "GET /v1/plans",
+        "db_tables": [
+          "plan"
+        ],
+        "tag": "inferred",
+        "ui_evidence": "observed",
+        "note": "Plan cards observed in screenshot; static in Gatsby build, but modeled to /v1/plans + plan table for the clone."
+      },
+      {
+        "ui_element": "Buy / subscribe flow",
+        "screen": "buy",
+        "data_fields": [
+          "planId",
+          "billingPeriod",
+          "email"
+        ],
+        "api_endpoint": "POST /v1/subscription",
+        "db_tables": [
+          "subscription",
+          "plan"
+        ],
+        "tag": "inferred",
+        "ui_evidence": "observed",
+        "note": "Buy page gates on the same login form (action='login'); subscribe endpoint/state inferred."
+      },
+      {
+        "ui_element": "Broker / import search box",
+        "screen": "import",
+        "data_fields": [
+          "searchTerm",
+          "sourceName",
+          "sourceType(broker|bank|RTA|PMS)",
+          "supportedFormats[]"
+        ],
+        "api_endpoint": "GET /v1/import/sources",
+        "db_tables": [
+          "import_source"
+        ],
+        "tag": "inferred",
+        "ui_evidence": "observed",
+        "note": "Search input (name=searchTerm) + 'View All' broker cards observed; 700+ source master served via inferred endpoint."
+      },
+      {
+        "ui_element": "Referral program page",
+        "screen": "refer",
+        "data_fields": [
+          "referralCode",
+          "refereeEmail",
+          "rewardStatus"
+        ],
+        "api_endpoint": "POST /v1/referrals (GET /v1/referrals)",
+        "db_tables": [
+          "referral"
+        ],
+        "tag": "inferred",
+        "ui_evidence": "observed",
+        "note": "Refer page observed; referral create/list API + table inferred."
+      },
+      {
+        "ui_element": "Reviews widget",
+        "screen": "reviews",
+        "data_fields": [
+          "rating",
+          "reviewText",
+          "author"
+        ],
+        "api_endpoint": "(none \u2014 EmbedSocial third-party embed)",
+        "db_tables": [],
+        "tag": "inferred",
+        "ui_evidence": "observed",
+        "note": "EmbedSocial iframe (tech_stack.third_party); no first-party API/DB."
+      },
+      {
+        "ui_element": "Blog listing / article",
+        "screen": "blog",
+        "data_fields": [
+          "title",
+          "slug",
+          "body",
+          "publishedAt"
+        ],
+        "api_endpoint": "(none at runtime \u2014 Sanity CMS at build time)",
+        "db_tables": [],
+        "tag": "inferred",
+        "ui_evidence": "observed",
+        "note": "Gatsby + Sanity build-time content (tech_stack.cms); no first-party runtime API/DB."
+      },
+      {
+        "ui_element": "Contact / support widget",
+        "screen": "contact_us",
+        "data_fields": [
+          "name",
+          "email",
+          "message"
+        ],
+        "api_endpoint": "(none \u2014 Freshdesk/Freshworks widget)",
+        "db_tables": [],
+        "tag": "inferred",
+        "ui_evidence": "observed",
+        "note": "Freshworks widget (tech_stack.third_party); routed to Freshdesk, not first-party DB."
+      },
+      {
+        "ui_element": "Portfolio dashboard / holdings table",
+        "screen": "app: portfolio dashboard (inferred)",
+        "data_fields": [
+          "portfolioName",
+          "instrumentName",
+          "assetClass",
+          "quantity",
+          "avgCost",
+          "currentPrice",
+          "currentValue",
+          "absoluteGain"
+        ],
+        "api_endpoint": "GET /v1/portfolios ; GET /v1/portfolios/{id}/holdings",
+        "db_tables": [
+          "portfolio",
+          "holding",
+          "instrument",
+          "portfolio_valuation"
+        ],
+        "tag": "inferred",
+        "ui_evidence": "inferred",
+        "note": "Authenticated SPA not in recon; primary holdings view inferred from feature_map (multi-asset consolidated view)."
+      },
+      {
+        "ui_element": "Consolidated portfolio-group view",
+        "screen": "app: group / family view (inferred)",
+        "data_fields": [
+          "groupName",
+          "memberPortfolios[]",
+          "consolidatedValue",
+          "consolidatedGain"
+        ],
+        "api_endpoint": "GET /v1/portfolio-groups ; GET /v1/portfolio-groups/{id}",
+        "db_tables": [
+          "portfolio_group",
+          "portfolio_group_member",
+          "portfolio"
+        ],
+        "tag": "inferred",
+        "ui_evidence": "inferred",
+        "note": "Family/client consolidation from feature_map; group + member join inferred."
+      },
+      {
+        "ui_element": "Transactions ledger",
+        "screen": "app: transactions (inferred)",
+        "data_fields": [
+          "date",
+          "instrument",
+          "type(buy|sell|dividend|CA|charge)",
+          "quantity",
+          "price",
+          "amount",
+          "portfolio"
+        ],
+        "api_endpoint": "GET /v1/transactions (POST/PATCH/DELETE /v1/transactions{/id})",
+        "db_tables": [
+          "transaction",
+          "instrument"
+        ],
+        "tag": "inferred",
+        "ui_evidence": "inferred",
+        "note": "Canonical ledger (core IP) \u2014 ledger UI inferred; transactions endpoints inferred."
+      },
+      {
+        "ui_element": "F&O positions view",
+        "screen": "app: F&O (inferred)",
+        "data_fields": [
+          "contract",
+          "segment(equity|currency|commodity)",
+          "qty",
+          "entryPrice",
+          "markPrice",
+          "realisedPL",
+          "unrealisedPL"
+        ],
+        "api_endpoint": "GET /v1/fno-positions",
+        "db_tables": [
+          "fno_position",
+          "instrument"
+        ],
+        "tag": "inferred",
+        "ui_evidence": "inferred",
+        "note": "F&O management from feature_map; MTM position view inferred."
+      },
+      {
+        "ui_element": "Performance analytics (Absolute Gain / XIRR)",
+        "screen": "app: performance (inferred)",
+        "data_fields": [
+          "scope",
+          "absoluteGain",
+          "annualisedReturnXIRR",
+          "period"
+        ],
+        "api_endpoint": "GET /v1/analytics/performance ; GET /v1/analytics/xirr",
+        "db_tables": [
+          "portfolio_valuation",
+          "holding",
+          "transaction"
+        ],
+        "tag": "inferred",
+        "ui_evidence": "inferred",
+        "note": "XIRR/gain per asset/class/portfolio/group from feature_map; compute reads valuations + ledger."
+      },
+      {
+        "ui_element": "Asset-allocation breakdown",
+        "screen": "app: allocation (inferred)",
+        "data_fields": [
+          "assetClass",
+          "weightPct",
+          "value",
+          "level"
+        ],
+        "api_endpoint": "GET /v1/analytics/allocation",
+        "db_tables": [
+          "holding",
+          "instrument"
+        ],
+        "tag": "inferred",
+        "ui_evidence": "inferred",
+        "note": "Multi-level asset-allocation insights from feature_map."
+      },
+      {
+        "ui_element": "Capital-gains (ITR) report",
+        "screen": "app: capital gains (inferred)",
+        "data_fields": [
+          "instrument",
+          "gainType(STCG|LTCG|intraday)",
+          "buyDate",
+          "sellDate",
+          "cost",
+          "proceeds",
+          "indexedCost",
+          "gain",
+          "financialYear"
+        ],
+        "api_endpoint": "GET /v1/capital-gains ; POST /v1/capital-gains/compute ; POST /v1/capital-gains/export",
+        "db_tables": [
+          "capital_gain",
+          "report",
+          "transaction"
+        ],
+        "tag": "inferred",
+        "ui_evidence": "inferred",
+        "note": "ITR-format CG with grandfathering/indexation + ClearTax/Winman/CompuTax export from feature_map."
+      },
+      {
+        "ui_element": "Import upload & job status",
+        "screen": "app: import job (inferred)",
+        "data_fields": [
+          "fileName",
+          "sourceId",
+          "format",
+          "parseStatus",
+          "rowsParsed",
+          "errors[]"
+        ],
+        "api_endpoint": "POST /v1/import/jobs ; GET /v1/import/jobs/{id} ; POST /v1/import/jobs/{id}/commit",
+        "db_tables": [
+          "import_job",
+          "import_source",
+          "transaction"
+        ],
+        "tag": "inferred",
+        "ui_evidence": "inferred",
+        "note": "Auto-import engine (5,000+ formats) upload->parse->commit-to-ledger inferred from feature_map/moat."
+      },
+      {
+        "ui_element": "Email auto-import rule",
+        "screen": "app: email import settings (inferred)",
+        "data_fields": [
+          "forwardingAddress",
+          "sourceMatch",
+          "targetPortfolio",
+          "enabled"
+        ],
+        "api_endpoint": "GET/POST/PATCH/DELETE /v1/import/email-rules",
+        "db_tables": [
+          "email_import_rule"
+        ],
+        "tag": "inferred",
+        "ui_evidence": "inferred",
+        "note": "Email-forwarding auto-import rule from feature_map."
+      },
+      {
+        "ui_element": "Live prices & corporate actions",
+        "screen": "app: instrument detail (inferred)",
+        "data_fields": [
+          "price",
+          "asOf",
+          "navDate",
+          "caType(dividend|bonus|split|merger|demerger)",
+          "caDate"
+        ],
+        "api_endpoint": "GET /v1/instruments/{id}/prices{/latest} ; GET /v1/instruments/{id}/corporate-actions ; GET /v1/market-data/quotes",
+        "db_tables": [
+          "price",
+          "corporate_action",
+          "instrument"
+        ],
+        "tag": "inferred",
+        "ui_evidence": "inferred",
+        "note": "15-min delayed equity, daily MF NAV, bond prices + CA feed from feature_map."
+      },
+      {
+        "ui_element": "Reports suite",
+        "screen": "app: reports (inferred)",
+        "data_fields": [
+          "reportType(Income|DueDates|Transactions|HoldingPeriod|Allocation|CG|AUM)",
+          "scope",
+          "period",
+          "downloadUrl"
+        ],
+        "api_endpoint": "GET/POST /v1/reports ; GET /v1/reports/{id}{/download}",
+        "db_tables": [
+          "report"
+        ],
+        "tag": "inferred",
+        "ui_evidence": "inferred",
+        "note": "Income/Due Dates/Transactions/Holding Period/Allocation/CG/AUM reports from feature_map."
+      },
+      {
+        "ui_element": "Advisor client console + global AUM",
+        "screen": "app: advisor console (inferred)",
+        "data_fields": [
+          "clientName",
+          "category",
+          "clientAUM",
+          "totalAUM",
+          "clientAccountId"
+        ],
+        "api_endpoint": "GET/POST /v1/advisor/clients ; POST /v1/advisor/clients/{id}/session ; GET /v1/advisor/aum",
+        "db_tables": [
+          "advisor_client",
+          "account",
+          "portfolio_valuation"
+        ],
+        "tag": "inferred",
+        "ui_evidence": "inferred",
+        "note": "Wealth-professional multi-tenant: client provisioning, context switch, global AUM from feature_map."
+      },
+      {
+        "ui_element": "Instruments incl. FD / NPS extensions",
+        "screen": "app: instrument admin (inferred)",
+        "data_fields": [
+          "symbol",
+          "isin",
+          "exchange",
+          "amc",
+          "fd(principal,rate,maturity)",
+          "nps(pran,tier,scheme)"
+        ],
+        "api_endpoint": "GET/POST /v1/instruments ; PUT /v1/instruments/{id}/fixed-deposit ; PUT /v1/instruments/{id}/nps",
+        "db_tables": [
+          "instrument",
+          "fixed_deposit",
+          "nps_account"
+        ],
+        "tag": "inferred",
+        "ui_evidence": "inferred",
+        "note": "Security master + FD/NPS asset-class extensions from data_model + feature_map."
+      },
+      {
+        "ui_element": "Account / white-label branding settings",
+        "screen": "app: account settings (inferred)",
+        "data_fields": [
+          "accountName",
+          "logoUrl",
+          "brandColors",
+          "users[]"
+        ],
+        "api_endpoint": "GET/PATCH /v1/account ; GET/POST /v1/account/users",
+        "db_tables": [
+          "account",
+          "app_user"
+        ],
+        "tag": "inferred",
+        "ui_evidence": "inferred",
+        "note": "White-label branding + account user management from feature_map."
+      }
+    ],
+    "diagram": "blueprint-out/dataflow/diagram.mmd",
+    "counts": {
+      "entries": 24,
+      "observed_ui": 10,
+      "inferred_ui": 14
+    },
+    "generatedBy": "bp-dataflow fusion stage",
+    "generatedAt": "2026-08-24"
+  },
+  "frontend": {
+    "mode": "clone",
+    "confidence": "observed",
+    "note": "Next.js 15 (App Router) + Tailwind v4 clone of MProfit built via the bp-cloner-template flow. The interactive /clone-website slash flow + GitHub vendor clone was not runnable non-interactively in this environment, so per the skill's documented fallback the app was scaffolded directly and section builds were parallelized across 5 fan-out builder agents writing disjoint route files. Marketing/auth pages are grounded in recon screenshots+DOM (confidence: observed); the product-app screens (dashboard/holdings/transactions/f&o/performance/capital-gains/reports/import) are inferred from the dataflow slice's app entries (no authed recon) and render mock fixtures wired to the Stage-3 inferred API client shapes.",
+    "repo_path": "blueprint-out/frontend",
+    "framework": "Next.js 15.1.6 (App Router, React 19, TypeScript) + Tailwind CSS v4",
+    "build": {
+      "status": "success",
+      "command": "npm run build",
+      "routes_prerendered": 23,
+      "output": ".next (static export of all routes)",
+      "runtime_smoke": "22/22 routes served HTTP 200 via `next start`; content spot-checks passed",
+      "api_client": "src/lib/api/client.ts (copied from api slice; typed MProfitClient, base https://api.mprofit.in)",
+      "data": "Product screens render src/lib/mock/data.ts fixtures shaped to the inferred client types; marketing content is static (Gatsby+Sanity in original)."
+    },
+    "design_system": {
+      "colors": {
+        "navy": "#12294f",
+        "green": "#3aad3a",
+        "cta_blue": "#1f6fb2"
+      },
+      "tokens": "src/app/globals.css (@theme Tailwind v4)",
+      "shared_components": [
+        "components/site/{Logo,Navbar,Footer,AnnouncementBar,ContactWidget}",
+        "components/ui/primitives (Section, Card, Eyebrow, GreenArrows)",
+        "components/app/{Sidebar,Topbar,charts(DonutChart,AreaChart)}"
+      ]
+    },
+    "routes": [
+      "/",
+      "/features",
+      "/pricing",
+      "/import",
+      "/about",
+      "/reviews",
+      "/blog",
+      "/refer",
+      "/contact-us",
+      "/terms-of-use",
+      "/privacy",
+      "/buy",
+      "/login",
+      "/sign-up",
+      "/app",
+      "/app/holdings",
+      "/app/transactions",
+      "/app/fno",
+      "/app/performance",
+      "/app/capital-gains",
+      "/app/reports",
+      "/app/import"
+    ],
+    "sections": [
+      {
+        "route": "/",
+        "screen": "home (marketing)",
+        "grounding": "observed",
+        "source": "recon/shots/root.png",
+        "notes": "Hero, 200k+/300+/700+ stat band, multi-asset value prop, press, Investors/Wealth-Pro segments, trusted-by, CTAs."
+      },
+      {
+        "route": "/features",
+        "screen": "features (marketing)",
+        "grounding": "observed",
+        "source": "recon/shots/features.png",
+        "notes": "9 alternating feature sections: asset classes, portfolios/groups, 700+ broker auto-import, F&O, multi-device, live prices/corp-actions, ITR capital gains, XIRR insights, wealth-pro client logins."
+      },
+      {
+        "route": "/pricing",
+        "screen": "pricing (marketing)",
+        "grounding": "observed",
+        "source": "recon/shots/pricing.png",
+        "dataflow": "Pricing plan cards -> GET /v1/plans",
+        "notes": "Investors vs Wealth-Professionals choice cards + segmented plan tiers with INR pricing."
+      },
+      {
+        "route": "/import",
+        "screen": "import search (marketing)",
+        "grounding": "observed",
+        "source": "recon/shots/import.png",
+        "dataflow": "Broker/import search -> GET /v1/import/sources",
+        "notes": "Client-side searchable grid of 700+ broker/bank/RTA/PMS sources with supported formats."
+      },
+      {
+        "route": "/about",
+        "screen": "about (marketing)",
+        "grounding": "observed",
+        "source": "recon/shots/about.png"
+      },
+      {
+        "route": "/reviews",
+        "screen": "reviews (marketing)",
+        "grounding": "observed",
+        "source": "recon/shots/reviews.png",
+        "dataflow": "Reviews widget (EmbedSocial, no first-party API)"
+      },
+      {
+        "route": "/blog",
+        "screen": "blog (marketing)",
+        "grounding": "observed",
+        "source": "recon/shots/blog.png",
+        "dataflow": "Sanity CMS at build time (no runtime API)"
+      },
+      {
+        "route": "/refer",
+        "screen": "referral (marketing)",
+        "grounding": "observed",
+        "source": "recon/shots/refer.png",
+        "dataflow": "Referral -> POST/GET /v1/referrals"
+      },
+      {
+        "route": "/contact-us",
+        "screen": "contact (marketing)",
+        "grounding": "observed",
+        "source": "recon/shots/contact_us.png",
+        "dataflow": "Contact/support (Freshdesk widget, no first-party API)"
+      },
+      {
+        "route": "/terms-of-use",
+        "screen": "terms (marketing)",
+        "grounding": "observed",
+        "source": "recon/shots/terms_of_use.png"
+      },
+      {
+        "route": "/privacy",
+        "screen": "privacy (marketing)",
+        "grounding": "observed",
+        "source": "recon/shots/privacy.png"
+      },
+      {
+        "route": "/buy",
+        "screen": "buy/subscribe (marketing)",
+        "grounding": "observed",
+        "source": "recon/shots/buy.png",
+        "dataflow": "Buy flow -> POST /v1/subscription (gated on POST /v1/auth/login)"
+      },
+      {
+        "route": "/login",
+        "screen": "login (auth split-screen)",
+        "grounding": "observed",
+        "source": "recon/shots/login.png",
+        "dataflow": "Login -> POST /v1/auth/login; Reset modal -> POST /v1/auth/password/reset-request|reset-confirm"
+      },
+      {
+        "route": "/sign-up",
+        "screen": "sign-up (auth split-screen)",
+        "grounding": "observed",
+        "source": "recon/shots/sign_up.png",
+        "dataflow": "Sign-up -> POST /v1/auth/signup (userType INVESTOR|WEALTH_PROFESSIONAL, referralCode?)"
+      },
+      {
+        "route": "/app",
+        "screen": "portfolio dashboard (product)",
+        "grounding": "inferred",
+        "dataflow": "GET /v1/portfolios/{id}/holdings ; GET /v1/analytics/performance ; GET /v1/analytics/allocation",
+        "notes": "KPI cards (value/invested/gain/XIRR), value area-chart, allocation donut, top holdings."
+      },
+      {
+        "route": "/app/holdings",
+        "screen": "holdings (product)",
+        "grounding": "inferred",
+        "dataflow": "GET /v1/holdings",
+        "notes": "Full multi-asset holdings table with asset-class filter tabs + totals row."
+      },
+      {
+        "route": "/app/transactions",
+        "screen": "transactions ledger (product)",
+        "grounding": "inferred",
+        "dataflow": "GET /v1/transactions ; POST /v1/transactions",
+        "notes": "Canonical transaction ledger with type badges + type filter."
+      },
+      {
+        "route": "/app/fno",
+        "screen": "F&O positions (product)",
+        "grounding": "inferred",
+        "dataflow": "GET /v1/fno-positions"
+      },
+      {
+        "route": "/app/performance",
+        "screen": "performance analytics (product)",
+        "grounding": "inferred",
+        "dataflow": "GET /v1/analytics/performance ; GET /v1/analytics/xirr ; GET /v1/analytics/allocation"
+      },
+      {
+        "route": "/app/capital-gains",
+        "screen": "capital gains ITR (product)",
+        "grounding": "inferred",
+        "dataflow": "GET /v1/capital-gains ; POST /v1/capital-gains/compute ; POST /v1/capital-gains/export",
+        "notes": "FY/term filters, STCG/LTCG/intra-day summary, ITR-format table, grandfathering/indexation note, ClearTax/Winman/CompuTax export menu."
+      },
+      {
+        "route": "/app/reports",
+        "screen": "reports suite (product)",
+        "grounding": "inferred",
+        "dataflow": "GET/POST /v1/reports ; GET /v1/reports/{id}/download"
+      },
+      {
+        "route": "/app/import",
+        "screen": "import engine (product)",
+        "grounding": "inferred",
+        "dataflow": "POST /v1/import/jobs ; GET /v1/import/jobs/{id} ; GET /v1/import/sources ; /v1/import/email-rules",
+        "notes": "Upload zone, recent-jobs table with parse status, email auto-import rule card."
+      }
+    ],
+    "counts": {
+      "routes": 22,
+      "marketing_pages": 12,
+      "auth_pages": 2,
+      "product_pages": 8,
+      "prerendered": 23
+    },
+    "generatedBy": "blueprint-stage5-frontend (bp-cloner-template fallback: direct scaffold + 5 parallel builder agents)",
+    "generatedAt": "2026-08-24"
+  }
+}

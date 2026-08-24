@@ -1,0 +1,18 @@
+# Blueprint in Docker. Mounts your existing Claude login + the project.
+# Start Docker Desktop first, then:  docker compose run --rm blueprint
+services:
+  blueprint:
+    build: .
+    stdin_open: true
+    tty: true
+    environment:
+      - IS_SANDBOX=1     # lets Claude Code use bypass/skip-permissions while running as root in-container
+    ports:
+      - "9889:9889"      # CAO dashboard -> http://localhost:9889 on Windows
+      - "3000:3000"      # the cloned Next.js app -> http://localhost:3000
+    volumes:
+      - .:/work                                        # the repo
+      - ${USERPROFILE}/.claude:/root/.claude           # token (credentials.json)
+      - ${USERPROFILE}/.claude.json:/root/.claude.json # login+onboarding state (fixes interactive login prompt)
+      - ${USERPROFILE}/.aws:/root/.aws                 # CAO stores agents/skills/workflows here
+    working_dir: /work

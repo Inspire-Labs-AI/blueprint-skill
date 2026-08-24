@@ -1,0 +1,7 @@
+{
+  "name": "blueprint",
+  "version": "0.1.0",
+  "description": "Plan-first web-app cloner. /blueprint <url> crawls a live product, captures its real network APIs, and produces a plan + system design + effort/token/$ estimate, then builds the clone. Honest: tags observed vs inferred, never fabricates a backend it didn't capture.",
+  "author": { "name": "Jyothi Kumar" },
+  "keywords": ["clone", "reverse-engineering", "blueprint", "playwright"]
+}

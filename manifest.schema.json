@@ -1,0 +1,124 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Blueprint manifest — the stage contract",
+  "description": "Single source of truth passed between every Blueprint stage. Each agent reads it, does its job, and writes its slice back. Path is always ./blueprint-out/manifest.json (relative to the run's working dir).",
+  "type": "object",
+  "required": ["target", "status"],
+  "properties": {
+    "target": {
+      "type": "object",
+      "required": ["url"],
+      "properties": {
+        "url": { "type": "string", "description": "Product being cloned" },
+        "extra_urls": { "type": "array", "items": { "type": "string" } },
+        "auth": {
+          "type": ["object", "null"],
+          "description": "Present ONLY for authorized targets. Enables live API/DB capture.",
+          "properties": {
+            "authorized": { "type": "boolean" },
+            "login_url": { "type": "string" },
+            "notes": { "type": "string" }
+          }
+        }
+      }
+    },
+    "recon": {
+      "type": "object",
+      "description": "Stage 0 output",
+      "properties": {
+        "screenshots": { "type": "array", "items": { "type": "string" }, "description": "Paths under blueprint-out/recon/" },
+        "har": { "type": "string", "description": "Captured network traffic file" },
+        "dom": { "type": "string" },
+        "routes": { "type": "array", "items": { "type": "string" } }
+      }
+    },
+    "intel": {
+      "type": "object",
+      "description": "Stage 1 output (saas-reverse)",
+      "properties": {
+        "feature_map": { "type": "array", "items": { "type": "string" } },
+        "tech_stack": { "type": "object" },
+        "priorities": { "type": "array", "items": { "type": "string" } },
+        "moat": { "type": "string" },
+        "build_prompt": { "type": "string" }
+      }
+    },
+    "database": {
+      "type": "object",
+      "description": "Stage 2 output (screenshot2sql / dba-mcp)",
+      "properties": {
+        "schema_prisma": { "type": "string" },
+        "schema_sql": { "type": "string" },
+        "er_diagram": { "type": "string" },
+        "tables": { "type": "array", "items": { "type": "string" } },
+        "replicated": { "type": "boolean", "description": "true if dba-mcp replicate_database ran (authorized only)" }
+      }
+    },
+    "api": {
+      "type": "object",
+      "description": "Stage 3 output (reverse-api-engineer / Integuru)",
+      "properties": {
+        "endpoints": { "type": "array", "items": { "type": "object" } },
+        "client_path": { "type": "string" },
+        "language": { "type": "string", "default": "typescript" },
+        "auth_flow": { "type": "string" },
+        "live": { "type": "boolean", "description": "true = client hits real endpoints (authorized), false = stubbed" }
+      }
+    },
+    "dataflow": {
+      "type": "object",
+      "description": "Stage 4 output (dataflow-mapper) — the end-to-end map. THE core artifact: correlates every UI element to the data it shows, the API endpoint that serves it, and the DB table(s) behind it. Built by fusing recon + intel + database + api, even when only screenshots were available (endpoints/tables become inferred, flagged as such).",
+      "properties": {
+        "map": {
+          "type": "array",
+          "description": "One entry per UI element / data surface.",
+          "items": {
+            "type": "object",
+            "properties": {
+              "ui_element": { "type": "string", "description": "e.g. 'dashboard revenue card', 'orders table row'" },
+              "screen": { "type": "string", "description": "which screenshot/route it lives on" },
+              "data_fields": { "type": "array", "items": { "type": "string" }, "description": "fields shown, e.g. ['amount','currency','created_at']" },
+              "api_endpoint": { "type": "string", "description": "GET /api/v1/... — real (from HAR) or inferred" },
+              "db_tables": { "type": "array", "items": { "type": "string" } },
+              "confidence": { "enum": ["observed", "inferred"], "description": "observed = seen in HAR/DOM; inferred = LLM guess from screenshot" }
+            }
+          }
+        },
+        "diagram": { "type": "string", "description": "Path to a Mermaid flowchart: UI -> API -> DB" }
+      }
+    },
+    "frontend": {
+      "type": "object",
+      "description": "Stage 5 output (ai-website-cloner-template), consumes dataflow.map so each section knows what data it needs",
+      "properties": {
+        "repo_path": { "type": "string" },
+        "framework": { "type": "string", "default": "next" },
+        "sections": { "type": "array", "items": { "type": "string" } },
+        "routes": { "type": "array", "items": { "type": "string" } }
+      }
+    },
+    "assembly": {
+      "type": "object",
+      "description": "Stage 5 output (assembler)",
+      "properties": {
+        "repo_path": { "type": "string" },
+        "wired": { "type": "boolean" },
+        "run_cmd": { "type": "string" },
+        "notes": { "type": "string" }
+      }
+    },
+    "status": {
+      "type": "object",
+      "description": "Per-stage state so the workflow can resume and the supervisor can see progress.",
+      "properties": {
+        "recon":    { "enum": ["pending", "running", "done", "failed"] },
+        "intel":    { "enum": ["pending", "running", "done", "failed"] },
+        "database": { "enum": ["pending", "running", "done", "failed"] },
+        "api":      { "enum": ["pending", "running", "done", "failed"] },
+        "dataflow": { "enum": ["pending", "running", "done", "failed"] },
+        "frontend": { "enum": ["pending", "running", "done", "failed"] },
+        "assembly": { "enum": ["pending", "running", "done", "failed"] }
+      }
+    }
+  }
+}

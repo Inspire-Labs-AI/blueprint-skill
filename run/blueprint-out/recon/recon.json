@@ -1,0 +1,36 @@
+{
+  "routes": [
+    "https://www.mprofit.in/",
+    "https://www.mprofit.in/features",
+    "https://www.mprofit.in/pricing",
+    "https://www.mprofit.in/import",
+    "https://www.mprofit.in/about",
+    "https://www.mprofit.in/buy",
+    "https://www.mprofit.in/login",
+    "https://www.mprofit.in/sign-up",
+    "https://www.mprofit.in/reviews",
+    "https://www.mprofit.in/blog",
+    "https://www.mprofit.in/terms-of-use",
+    "https://www.mprofit.in/privacy",
+    "https://www.mprofit.in/refer",
+    "https://www.mprofit.in/contact-us"
+  ],
+  "screenshots": [
+    "run\\blueprint-out\\recon\\shots\\root.png",
+    "run\\blueprint-out\\recon\\shots\\features.png",
+    "run\\blueprint-out\\recon\\shots\\pricing.png",
+    "run\\blueprint-out\\recon\\shots\\import.png",
+    "run\\blueprint-out\\recon\\shots\\about.png",
+    "run\\blueprint-out\\recon\\shots\\buy.png",
+    "run\\blueprint-out\\recon\\shots\\login.png",
+    "run\\blueprint-out\\recon\\shots\\sign_up.png",
+    "run\\blueprint-out\\recon\\shots\\reviews.png",
+    "run\\blueprint-out\\recon\\shots\\blog.png",
+    "run\\blueprint-out\\recon\\shots\\terms_of_use.png",
+    "run\\blueprint-out\\recon\\shots\\privacy.png",
+    "run\\blueprint-out\\recon\\shots\\refer.png",
+    "run\\blueprint-out\\recon\\shots\\contact_us.png"
+  ],
+  "dom": "run\\blueprint-out\\recon\\dom",
+  "har": null
+}

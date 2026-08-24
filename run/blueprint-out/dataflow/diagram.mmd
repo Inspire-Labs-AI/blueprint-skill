@@ -1,0 +1,155 @@
+flowchart LR
+  %% MProfit dataflow — UI -> API -> DB
+  %% solid arrow = observed UI surface; dotted arrow = inferred (no HAR/auth)
+  %% ALL API + DB nodes are confidence:inferred (no HAR, no authorized session)
+
+  subgraph UI["UI surfaces"]
+    direction TB
+    U_login["Login form (login/buy)"]
+    U_reset["Reset-password modal"]
+    U_signup["Sign-up CTA"]
+    U_pricing["Pricing plan cards"]
+    U_buy["Buy / subscribe"]
+    U_import_search["Broker/import search"]
+    U_refer["Referral page"]
+    U_reviews["Reviews widget (EmbedSocial)"]
+    U_blog["Blog (Sanity)"]
+    U_contact["Contact / support (Freshdesk)"]
+    U_dash["Portfolio dashboard / holdings"]
+    U_group["Consolidated group view"]
+    U_txn["Transactions ledger"]
+    U_fno["F&O positions"]
+    U_perf["Performance (XIRR / gain)"]
+    U_alloc["Asset allocation"]
+    U_cg["Capital-gains (ITR) report"]
+    U_impjob["Import upload / job status"]
+    U_emailrule["Email auto-import rule"]
+    U_prices["Live prices / corp actions"]
+    U_reports["Reports suite"]
+    U_advisor["Advisor client console + AUM"]
+    U_instr["Instruments (FD / NPS)"]
+    U_account["Account / branding settings"]
+  end
+
+  subgraph API["api.mprofit.in /v1 (inferred)"]
+    direction TB
+    A_login["POST /auth/login"]
+    A_reset["POST /auth/password/reset-*"]
+    A_signup["POST /auth/signup"]
+    A_plans["GET /plans"]
+    A_sub["POST /subscription"]
+    A_impsrc["GET /import/sources"]
+    A_refer["POST /referrals"]
+    A_port["GET /portfolios{/id/holdings}"]
+    A_groups["GET /portfolio-groups"]
+    A_txn["GET /transactions"]
+    A_fno["GET /fno-positions"]
+    A_perf["GET /analytics/performance|xirr"]
+    A_alloc["GET /analytics/allocation"]
+    A_cg["GET /capital-gains + /compute + /export"]
+    A_impjob["POST /import/jobs + /commit"]
+    A_emailrule["/import/email-rules"]
+    A_prices["GET /instruments/{id}/prices + /corporate-actions"]
+    A_reports["/reports"]
+    A_advisor["/advisor/clients + /advisor/aum"]
+    A_instr["/instruments + /fixed-deposit + /nps"]
+    A_account["GET/PATCH /account"]
+    A_none["(no first-party API — 3rd-party/CMS)"]
+  end
+
+  subgraph DB["Postgres (inferred)"]
+    direction TB
+    D_user[(app_user)]
+    D_account[(account)]
+    D_advisor[(advisor_client)]
+    D_plan[(plan)]
+    D_sub[(subscription)]
+    D_referral[(referral)]
+    D_portfolio[(portfolio)]
+    D_group[(portfolio_group)]
+    D_groupmem[(portfolio_group_member)]
+    D_instrument[(instrument)]
+    D_holding[(holding)]
+    D_txn[(transaction)]
+    D_fno[(fno_position)]
+    D_fd[(fixed_deposit)]
+    D_nps[(nps_account)]
+    D_price[(price)]
+    D_ca[(corporate_action)]
+    D_val[(portfolio_valuation)]
+    D_cg[(capital_gain)]
+    D_impsrc[(import_source)]
+    D_impjob[(import_job)]
+    D_emailrule[(email_import_rule)]
+    D_report[(report)]
+  end
+
+  %% observed UI (solid) -> inferred API
+  U_login --> A_login
+  U_reset --> A_reset
+  U_signup --> A_signup
+  U_pricing --> A_plans
+  U_buy --> A_sub
+  U_import_search --> A_impsrc
+  U_refer --> A_refer
+  U_reviews -.-> A_none
+  U_blog -.-> A_none
+  U_contact -.-> A_none
+
+  %% inferred product UI (dotted) -> inferred API
+  U_dash -.-> A_port
+  U_group -.-> A_groups
+  U_txn -.-> A_txn
+  U_fno -.-> A_fno
+  U_perf -.-> A_perf
+  U_alloc -.-> A_alloc
+  U_cg -.-> A_cg
+  U_impjob -.-> A_impjob
+  U_emailrule -.-> A_emailrule
+  U_prices -.-> A_prices
+  U_reports -.-> A_reports
+  U_advisor -.-> A_advisor
+  U_instr -.-> A_instr
+  U_account -.-> A_account
+
+  %% API -> DB
+  A_login --> D_user
+  A_login --> D_account
+  A_reset --> D_user
+  A_signup --> D_user
+  A_signup --> D_account
+  A_plans --> D_plan
+  A_sub --> D_sub
+  A_sub --> D_plan
+  A_impsrc --> D_impsrc
+  A_refer --> D_referral
+  A_port --> D_portfolio
+  A_port --> D_holding
+  A_port --> D_instrument
+  A_port --> D_val
+  A_groups --> D_group
+  A_groups --> D_groupmem
+  A_txn --> D_txn
+  A_txn --> D_instrument
+  A_fno --> D_fno
+  A_perf --> D_val
+  A_perf --> D_holding
+  A_perf --> D_txn
+  A_alloc --> D_holding
+  A_alloc --> D_instrument
+  A_cg --> D_cg
+  A_cg --> D_report
+  A_impjob --> D_impjob
+  A_impjob --> D_txn
+  A_impjob --> D_impsrc
+  A_emailrule --> D_emailrule
+  A_prices --> D_price
+  A_prices --> D_ca
+  A_reports --> D_report
+  A_advisor --> D_advisor
+  A_advisor --> D_account
+  A_instr --> D_instrument
+  A_instr --> D_fd
+  A_instr --> D_nps
+  A_account --> D_account
+  A_account --> D_user

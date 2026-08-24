@@ -1,0 +1,184 @@
+%% MProfit clone — inferred ER diagram (Blueprint Stage 2, DB)
+%% Confidence: INFERRED from UI screenshots + DOM. No HAR / no live DB.
+erDiagram
+    ACCOUNT ||--o{ APP_USER : "has"
+    ACCOUNT ||--o{ PORTFOLIO : "owns"
+    ACCOUNT ||--o{ PORTFOLIO_GROUP : "owns"
+    ACCOUNT ||--o{ SUBSCRIPTION : "has"
+    ACCOUNT ||--o{ IMPORT_JOB : "runs"
+    ACCOUNT ||--o{ REPORT : "generates"
+    ACCOUNT ||--o{ ADVISOR_CLIENT : "advisor_of"
+    ACCOUNT ||--o{ ADVISOR_CLIENT : "client_in"
+
+    PLAN ||--o{ SUBSCRIPTION : "sold_as"
+    APP_USER ||--o{ REFERRAL : "refers"
+    APP_USER ||--o{ EMAIL_IMPORT_RULE : "configures"
+    APP_USER ||--o{ PORTFOLIO : "owns"
+
+    PORTFOLIO ||--o{ HOLDING : "contains"
+    PORTFOLIO ||--o{ TRANSACTION : "records"
+    PORTFOLIO ||--o{ FNO_POSITION : "holds"
+    PORTFOLIO ||--o{ PORTFOLIO_VALUATION : "snapshotted_as"
+    PORTFOLIO ||--o{ PORTFOLIO_GROUP_MEMBER : "member_of"
+    PORTFOLIO_GROUP ||--o{ PORTFOLIO_GROUP_MEMBER : "groups"
+
+    INSTRUMENT ||--o{ HOLDING : "held_as"
+    INSTRUMENT ||--o{ TRANSACTION : "traded_in"
+    INSTRUMENT ||--o{ FNO_POSITION : "underlies"
+    INSTRUMENT ||--o{ PRICE : "priced_by"
+    INSTRUMENT ||--o{ CORPORATE_ACTION : "affected_by"
+    INSTRUMENT ||--o| FIXED_DEPOSIT : "detailed_as"
+    INSTRUMENT ||--o| NPS_ACCOUNT : "detailed_as"
+
+    IMPORT_SOURCE ||--o{ IMPORT_JOB : "parsed_from"
+    IMPORT_JOB ||--o{ TRANSACTION : "produces"
+
+    TRANSACTION ||--o{ CAPITAL_GAIN : "realises"
+
+    ACCOUNT {
+        string id PK
+        string name
+        enum   segment
+        string brand_logo_url
+    }
+    APP_USER {
+        string id PK
+        string account_id FK
+        string email UK
+        enum   user_type
+        string reset_code
+    }
+    ADVISOR_CLIENT {
+        string id PK
+        string advisor_account_id FK
+        string client_account_id FK
+        string category
+    }
+    PLAN {
+        string id PK
+        string code UK
+        enum   segment
+        decimal price_inr
+    }
+    SUBSCRIPTION {
+        string id PK
+        string account_id FK
+        string plan_id FK
+        string status
+    }
+    REFERRAL {
+        string id PK
+        string referrer_id FK
+        string code UK
+    }
+    PORTFOLIO {
+        string id PK
+        string account_id FK
+        string owner_id FK
+        string name
+    }
+    PORTFOLIO_GROUP {
+        string id PK
+        string account_id FK
+        string name
+    }
+    PORTFOLIO_GROUP_MEMBER {
+        string id PK
+        string group_id FK
+        string portfolio_id FK
+    }
+    INSTRUMENT {
+        string id PK
+        enum   asset_class
+        string isin
+        string symbol
+        string exchange
+    }
+    HOLDING {
+        string id PK
+        string portfolio_id FK
+        string instrument_id FK
+        decimal quantity
+        decimal avg_cost
+    }
+    TRANSACTION {
+        string id PK
+        string portfolio_id FK
+        string instrument_id FK
+        enum   type
+        datetime trade_date
+        decimal amount
+        string import_job_id FK
+    }
+    FNO_POSITION {
+        string id PK
+        string portfolio_id FK
+        enum   segment
+        enum   instr_type
+        datetime expiry_date
+        decimal strike_price
+    }
+    FIXED_DEPOSIT {
+        string id PK
+        string instrument_id FK
+        decimal principal
+        decimal interest_rate
+        datetime maturity_date
+    }
+    NPS_ACCOUNT {
+        string id PK
+        string instrument_id FK
+        string pran
+        string tier
+    }
+    PRICE {
+        string id PK
+        string instrument_id FK
+        datetime price_date
+        decimal price
+        string price_type
+    }
+    CORPORATE_ACTION {
+        string id PK
+        string instrument_id FK
+        enum   type
+        datetime ex_date
+    }
+    PORTFOLIO_VALUATION {
+        string id PK
+        string portfolio_id FK
+        datetime as_of_date
+        decimal market_value
+        decimal xirr
+    }
+    CAPITAL_GAIN {
+        string id PK
+        string transaction_id FK
+        enum   term
+        decimal gain_amount
+        string financial_year
+    }
+    IMPORT_SOURCE {
+        string id PK
+        string name
+        string category
+        array  file_formats
+    }
+    IMPORT_JOB {
+        string id PK
+        string account_id FK
+        string source_id FK
+        enum   channel
+        enum   status
+    }
+    EMAIL_IMPORT_RULE {
+        string id PK
+        string user_id FK
+        string forwarding_address
+    }
+    REPORT {
+        string id PK
+        string account_id FK
+        string type
+        string format
+    }

@@ -1,0 +1,21 @@
+# generated clone output — keep the tool, not the scraped/generated data
+run/blueprint-out/app/
+run/blueprint-out/frontend/
+run/blueprint-out/**/dom/
+run/blueprint-out/board.html
+runs/
+vendor/
+
+# deps / build / caches
+node_modules/
+.next/
+dist/
+.playwright-mcp/
+*.log
+
+# generated deliverables containing target/competitor data (share directly, don't commit)
+BLUEPRINT-BRIEF.html
+
+# os / editor
+.DS_Store
+Thumbs.db

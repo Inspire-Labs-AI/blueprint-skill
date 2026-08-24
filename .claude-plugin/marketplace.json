@@ -1,0 +1,12 @@
+{
+  "name": "blueprint-marketplace",
+  "owner": { "name": "Jyothi Kumar" },
+  "plugins": [
+    {
+      "name": "blueprint",
+      "source": "./plugin",
+      "description": "Plan-first web-app cloner: crawl a live product, capture real network APIs, produce a plan + system design + effort/token/$ estimate, then build the clone. Provides the /blueprint command.",
+      "version": "0.1.0"
+    }
+  ]
+}
