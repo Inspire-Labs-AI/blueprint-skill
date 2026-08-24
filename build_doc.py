@@ -334,7 +334,9 @@ footer{padding:40px 0 64px;color:var(--mut);font-size:12.5px;line-height:1.7;bor
  <table style="margin-top:24px"><caption>Install across all platforms</caption>
   <tr><th>Platform</th><th>Install</th><th>Then run</th></tr>
   <tr><td><b>Claude&nbsp;Code</b></td>
-   <td><pre style="margin:0">/plugin marketplace add Inspire-Labs-AI/blueprint-skill
+   <td><pre style="margin:0"># 1 - add the marketplace
+/plugin marketplace add Inspire-Labs-AI/blueprint-skill
+# 2 - install the plugin, then restart
 /plugin install blueprint@blueprint-marketplace</pre></td>
    <td><code>/blueprint &lt;url&gt;</code></td></tr>
   <tr><td><b>Cursor</b></td>
