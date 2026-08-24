@@ -115,6 +115,17 @@ ul{padding-left:20px}li{margin:7px 0;color:var(--ink2)}
 .hl{color:var(--ink);font-weight:600}
 footer{padding:40px 0 64px;color:var(--mut);font-size:12.5px;line-height:1.7;border-top:1px solid var(--line)}
 .sig{font-family:var(--serif);font-style:italic;color:var(--ink2)}
+
+/* 10x BANNER */
+.banner{display:flex;gap:34px;align-items:center;flex-wrap:wrap;margin:0 0 6px;padding:34px 38px;
+ background:linear-gradient(100deg,rgba(201,162,74,.13),rgba(201,162,74,.03));
+ border:1px solid rgba(201,162,74,.32);border-radius:4px;position:relative;overflow:hidden}
+.banner::before{content:"";position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--brass)}
+.banner .x{font-family:var(--serif);font-weight:600;font-size:clamp(56px,9vw,104px);line-height:.9;
+ color:var(--brass2);letter-spacing:-.02em;flex:0 0 auto}
+.banner .bt{flex:1;min-width:260px}
+.banner .bt h3{font-family:var(--serif);font-size:clamp(20px,2.6vw,27px);color:var(--ink);line-height:1.2;margin-bottom:8px}
+.banner .bt p{color:var(--ink2);font-size:15.5px;max-width:56ch}
 </style></head><body>
 
 <div class=wrap>
@@ -141,6 +152,13 @@ footer{padding:40px 0 64px;color:var(--mut);font-size:12.5px;line-height:1.7;bor
   <div class=cell><h3>Time</h3><p class=mut>Per-feature difficulty converted to a realistic day-range — not a guess.</p></div>
   <div class=cell><h3>Cost</h3><p class=mut>Model tokens plus infrastructure run-cost, expressed as a defensible dollar range.</p></div>
   <div class=cell><h3>Risk</h3><p class=mut>What is real versus behind a login, with an unambiguous go / no-go.</p></div>
+ </div>
+ <div class=banner style="margin-top:36px">
+  <div class=x>10&times;</div>
+  <div class=bt><h3>Give it a login, and the output multiplies</h3>
+   <p>With authorized credentials for the target app, Blueprint captures the <b class=hl>real authenticated API,
+   data model, and product screens</b> — instead of inferring them. That single input turns a demo shell into a
+   genuine clone and roughly <b class=hl>10&times;</b> the usable output. It is the highest-leverage thing you can provide.</p></div>
  </div>
 </section>
 

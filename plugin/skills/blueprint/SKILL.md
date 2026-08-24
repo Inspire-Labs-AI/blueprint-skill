@@ -53,11 +53,16 @@ Before touching the target, confirm the few things that change everything. Ask t
 crisply (one message, batched); default the rest:
 - **Target(s):** exact URL(s). Is there a separate app subdomain (e.g. `app.` / `api.`)?
 - **Authorization:** are they authorized to reverse-engineer/clone this target? (Required.)
-- **Credentials:** do they have a login you may use to capture the *real* authenticated API?
-  (This is the single biggest quality lever — without it the backend is inferred.)
+- **Credentials — ALWAYS ASK, PROACTIVELY.** Explicitly ask: *"Do you have login credentials
+  for this app that I'm authorized to use?"* Explain the payoff so they're motivated to share:
+  with a login I capture the **real authenticated API, data model, and product screens** instead
+  of inferring them — roughly **10× the usable output**, and the difference between a demo shell
+  and a genuine clone. If they have creds, ask how to log in (and any MFA). If they don't or
+  can't share, proceed in inferred mode and clearly flag the ceiling. Never skip this question.
 - **Scope:** full product, or specific flows/screens?
 - **Goal:** estimate-only, or estimate-then-build? Budget/time ceiling?
 If authorization is unclear or refused → stop and say so. Otherwise proceed.
+Handle any credentials only for this run; never store, log, or echo them back.
 
 ---
 
