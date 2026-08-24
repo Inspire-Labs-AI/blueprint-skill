@@ -15,4 +15,7 @@ services:
       - ${USERPROFILE}/.claude:/root/.claude           # token (credentials.json)
       - ${USERPROFILE}/.claude.json:/root/.claude.json # login+onboarding state (fixes interactive login prompt)
       - ${USERPROFILE}/.aws:/root/.aws                 # CAO stores agents/skills/workflows here
+      - ${USERPROFILE}/.config/opencode:/root/.config/opencode  # OpenCode login/config (cross-provider)
+      - ${USERPROFILE}/.codex:/root/.codex             # Codex login (cross-provider; ignore if absent)
+      - ${USERPROFILE}/.cursor:/root/.cursor           # Cursor config (cross-provider; skill-injection limited)
     working_dir: /work

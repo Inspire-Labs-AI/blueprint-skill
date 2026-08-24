@@ -8,8 +8,13 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 RUN curl -LsSf https://astral.sh/uv/install.sh | sh
 ENV PATH="/root/.local/bin:${PATH}"
 
-# Claude Code CLI + CAO
-RUN npm i -g @anthropic-ai/claude-code
+# Agent CLIs — Claude Code + OpenCode + Codex (so CAO can spawn any of them cross-provider)
+RUN npm i -g @anthropic-ai/claude-code opencode-ai @openai/codex
+# Cursor CLI (optional; note: CAO skill-injection into Cursor is currently limited)
+RUN curl -fsSL https://cursor.com/install | bash || echo "cursor-agent install skipped"
+ENV PATH="/root/.local/bin:${PATH}"
+
+# CAO orchestrator
 RUN uv tool install "git+https://github.com/awslabs/cli-agent-orchestrator.git@main"
 
 # Playwright + Chromium for recon

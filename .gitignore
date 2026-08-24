@@ -15,7 +15,10 @@ dist/
 
 # generated deliverables containing target/competitor data (share directly, don't commit)
 BLUEPRINT-BRIEF.html
+BLUEPRINT-BRIEF.pdf
 cover.png
+light.png
+check*.png
 
 # os / editor
 .DS_Store

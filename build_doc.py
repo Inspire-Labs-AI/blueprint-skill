@@ -12,8 +12,8 @@ HTML=r"""<!doctype html><html lang=en><head><meta charset=utf-8>
 <meta name=viewport content="width=device-width,initial-scale=1"><title>Blueprint — Executive Brief</title>
 <style>
 :root{
- --paper:#14130f; --paper2:#1b1a15; --panel:#1f1d17; --line:#332f25; --line2:#433d2e;
- --ink:#ece6d7; --ink2:#c8c1af; --mut:#948c78; --brass:#c9a24a; --brass2:#e0bd66;
+ --paper:#f6f3ec; --paper2:#efe9dc; --panel:#fbf8f2; --line:#e4ddcd; --line2:#d6cdb9;
+ --ink:#1d1b17; --ink2:#423d33; --mut:#867e6f; --brass:#8a2f3f; --brass2:#a5384a;
  --d1:#6f7d53; --d2:#8f8a49; --d3:#c09a4a; --d4:#bb7440; --d5:#a8493d;
  --serif:"Iowan Old Style","Palatino Linotype","Book Antiqua",Palatino,Georgia,"Times New Roman",serif;
  --sans:-apple-system,"Segoe UI",Inter,Roboto,Helvetica,Arial,sans-serif;
@@ -29,16 +29,16 @@ h1{font-family:var(--serif);font-weight:600;font-size:clamp(38px,6.4vw,74px);lin
 h2{font-family:var(--serif);font-weight:600;font-size:clamp(25px,3.6vw,38px);line-height:1.12;letter-spacing:-.005em}
 h3{font-family:var(--serif);font-weight:600;font-size:19px;letter-spacing:.005em;color:var(--ink)}
 p{color:var(--ink2)} .mut{color:var(--mut)}
-a{color:var(--brass2);text-decoration:none;border-bottom:1px solid rgba(201,162,74,.32);transition:border-color .15s}
+a{color:var(--brass2);text-decoration:none;border-bottom:1px solid rgba(138,47,63,.32);transition:border-color .15s}
 a:hover{border-bottom-color:var(--brass2)}
-td a,td b a{color:inherit;border-bottom:1px dotted rgba(201,162,74,.45)}
+td a,td b a{color:inherit;border-bottom:1px dotted rgba(138,47,63,.45)}
 td a:hover{color:var(--brass2)}
 
 /* COVER */
 .cover{min-height:82vh;display:flex;flex-direction:column;justify-content:center;position:relative;overflow:hidden;padding:80px 0 56px}
 .cover::before{content:"";position:absolute;inset:0;background:
- radial-gradient(120% 80% at 78% 8%,rgba(201,162,74,.10),transparent 55%),
- radial-gradient(90% 60% at 0% 100%,rgba(201,162,74,.05),transparent 60%);z-index:0}
+ radial-gradient(120% 80% at 78% 8%,rgba(138,47,63,.10),transparent 55%),
+ radial-gradient(90% 60% at 0% 100%,rgba(138,47,63,.05),transparent 60%);z-index:0}
 .cover>*{position:relative;z-index:1}
 .cover .meta{margin-top:34px;display:flex;gap:26px;flex-wrap:wrap;color:var(--mut);font-size:13px;letter-spacing:.04em}
 .cover .meta b{color:var(--ink2);font-weight:600}
@@ -63,7 +63,7 @@ section{padding:64px 0;border-top:1px solid var(--line)}
 
 /* LABELS */
 .lab{display:inline-block;font:600 10.5px/1 var(--sans);letter-spacing:.14em;text-transform:uppercase;padding:5px 9px;border:1px solid var(--line2);border-radius:2px;color:var(--ink2);white-space:nowrap}
-.lab.on{border-color:rgba(201,162,74,.5);color:var(--brass2)}
+.lab.on{border-color:rgba(138,47,63,.5);color:var(--brass2)}
 .lab.off{color:var(--mut);opacity:.7}
 .lab.warn{border-color:rgba(187,116,64,.55);color:#d69a67}
 
@@ -94,8 +94,17 @@ blockquote{font-family:var(--serif);font-size:clamp(22px,3vw,30px);line-height:1
 blockquote cite{display:block;font-family:var(--sans);font-size:13px;font-style:normal;letter-spacing:.04em;color:var(--mut);margin-top:16px}
 
 /* CODE */
-pre{background:#0f0e0b;border:1px solid var(--line2);border-radius:3px;padding:16px 18px;overflow:auto;font-family:var(--mono);font-size:13px;color:#d6cba6;line-height:1.65}
+pre{background:#f1ece1;border:1px solid var(--line2);border-radius:3px;padding:16px 18px;overflow:auto;font-family:var(--mono);font-size:13px;color:#4a4138;line-height:1.65}
 code{font-family:var(--mono);color:var(--brass2);font-size:.92em}
+@media print{
+ body{background:#fff;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+ .wrap{max-width:none;padding:0}
+ .cover{min-height:auto;padding:6mm 0 10mm}
+ section{padding:12mm 0;break-inside:auto}
+ .cell,figure,.banner,.kpi,.flow,tr,blockquote,pre,table{break-inside:avoid}
+ h2{break-after:avoid} a{border:none!important;color:var(--ink)}
+ @page{margin:14mm}
+}
 
 /* KPI */
 .kpi{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--line);border:1px solid var(--line)}
@@ -118,8 +127,8 @@ footer{padding:40px 0 64px;color:var(--mut);font-size:12.5px;line-height:1.7;bor
 
 /* 10x BANNER */
 .banner{display:flex;gap:34px;align-items:center;flex-wrap:wrap;margin:0 0 6px;padding:34px 38px;
- background:linear-gradient(100deg,rgba(201,162,74,.13),rgba(201,162,74,.03));
- border:1px solid rgba(201,162,74,.32);border-radius:4px;position:relative;overflow:hidden}
+ background:linear-gradient(100deg,rgba(138,47,63,.13),rgba(138,47,63,.03));
+ border:1px solid rgba(138,47,63,.32);border-radius:4px;position:relative;overflow:hidden}
 .banner::before{content:"";position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--brass)}
 .banner .x{font-family:var(--serif);font-weight:600;font-size:clamp(56px,9vw,104px);line-height:.9;
  color:var(--brass2);letter-spacing:-.02em;flex:0 0 auto}
@@ -311,17 +320,27 @@ footer{padding:40px 0 64px;color:var(--mut);font-size:12.5px;line-height:1.7;bor
 </section>
 
 <section>
- <div class=head><div class=num>10</div><div class=t><div class=eyebrow>Distribution</div>
-  <h2>Published as a plugin — installed in one line</h2></div></div>
- <div class=grid g2>
-  <div class=cell><h3>Claude Code &mdash; live now</h3>
-   <pre>/plugin marketplace add Inspire-Labs-AI/blueprint-skill
-/plugin install blueprint@blueprint-marketplace</pre>
-   <p class=mut>The private GitHub repository is the marketplace; no store submission. Access is gated to the organisation.</p></div>
-  <div class=cell><h3>Cursor &amp; OpenCode</h3>
-   <pre>npx github:Inspire-Labs-AI/blueprint-skill install</pre>
-   <p class=mut>Then simply <code>/blueprint &lt;url&gt;</code> in any of the three tools.</p></div>
- </div>
+ <div class=head><div class=num>10</div><div class=t><div class=eyebrow>Installation</div>
+  <h2>One line per platform — install and use</h2></div></div>
+ <p class=lead>Each tool runs the skill itself. No servers, no Docker, no orchestration to manage —
+ a teammate installs it once and runs <code>/blueprint &lt;url&gt;</code>.</p>
+ <table style="margin-top:24px"><caption>Install across all platforms</caption>
+  <tr><th>Platform</th><th>Install</th><th>Then run</th></tr>
+  <tr><td><b>Claude&nbsp;Code</b></td>
+   <td><pre style="margin:0">/plugin marketplace add Inspire-Labs-AI/blueprint-skill
+/plugin install blueprint@blueprint-marketplace</pre></td>
+   <td><code>/blueprint &lt;url&gt;</code></td></tr>
+  <tr><td><b>Cursor</b></td>
+   <td><pre style="margin:0">npx github:Inspire-Labs-AI/blueprint-skill install</pre></td>
+   <td><code>/blueprint &lt;url&gt;</code></td></tr>
+  <tr><td><b>OpenCode</b></td>
+   <td><pre style="margin:0">npx github:Inspire-Labs-AI/blueprint-skill install</pre></td>
+   <td><code>/blueprint &lt;url&gt;</code></td></tr>
+ </table>
+ <p class=mut style="margin-top:16px">The private GitHub repository <i>is</i> the marketplace — no store submission, access gated to the organisation.
+ <code>/plugin</code> is Claude-native; Cursor and OpenCode install via the <code>npx</code> line (it copies the skill and command into each tool).</p>
+ <div class="cell hi" style="border:1px solid var(--line2);border-radius:3px;margin-top:16px">
+  <h3>One requirement, on every platform</h3><p class=mut>A <b class=hl>browser tool</b> (Playwright / Chrome MCP) must be enabled in the tool — that is what captures the real screens and network APIs. Without it, the skill has nothing to observe and falls back to guesswork.</p></div>
 </section>
 
 <section>

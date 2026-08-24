@@ -2,8 +2,7 @@
 name: frontend-agent
 description: Stage 5 — clones the UI into a Next.js 16 + shadcn + Tailwind codebase via ai-website-cloner-template's parallel per-section builder agents.
 role: developer
-provider: claude_code
-permissionMode: bypassPermissions
+provider: opencode
 skills: ["bp-cloner-template", "bp-manifest"]
 mcpServers:
   cao-mcp-server:
