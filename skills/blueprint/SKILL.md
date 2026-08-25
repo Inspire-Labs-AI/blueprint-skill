@@ -69,18 +69,31 @@ Handle any credentials only for this run; never store, log, or echo them back.
 ## PHASE 1 — Deep reconnaissance (autonomous)
 Go wide, then deep. Record everything into `blueprint-out/recon/`.
 
-### 1a. Surface map
+### 1a. Ingest the product's own words FIRST (docs, FAQ, help, pricing, changelog)
+Before mapping pixels and payloads, understand what the product *claims to be*. Read the
+target's own documentation and extract the product's intent — this is how you "figure it out"
+instead of guessing from the UI:
+- **Sources:** help center / knowledge base, `/docs` & API reference, FAQ, pricing & plans,
+  feature/tour pages, blog & changelog/release notes, onboarding emails, T&C/privacy (for
+  data & compliance triggers), and any developer/integration docs.
+- **Extract:** the full feature list, business rules & edge cases, domain terminology/glossary,
+  pricing tiers & entitlements (feature-gating), integrations/3rd-parties named, and roadmap
+  hints. Save to `blueprint-out/recon/product-knowledge.md`, each item tagged with its source.
+- This corpus seeds the feature map and PRD (Phase 2) and tells recon what to go hunt for
+  (a documented feature with no screen you found = a screen behind login or a gap to chase).
+
+### 1b. Surface map
 - Visit the URL; enumerate routes from nav, footer, sitemap.xml, robots.txt, and in-page links.
 - Screenshot every reachable screen (full page); save rendered DOM. Note SPA vs SSR/SSG.
 
-### 1b. Network capture — the core
+### 1c. Network capture — the core
 - On each screen and interaction, capture every XHR/fetch/GraphQL/WebSocket: method, URL,
   request payload, response body/shape, status, auth headers, cookies. Use the Playwright
   MCP network tools (`browser_network_requests`) and `browser_evaluate` to trigger + read.
 - If authorized + credentialed: **log in and re-capture** the authenticated app. This is
   where the real endpoints and data models live.
 
-### 1c. Hunt the hidden surface (find the loopholes)
+### 1d. Hunt the hidden surface (find the loopholes)
 Authorized targets only; observe, don't exploit.
 - **JS bundle mining:** fetch main bundles + source maps; grep for API base URLs, route
   tables, endpoint strings, GraphQL queries, feature flags, and accidentally-shipped
@@ -93,18 +106,21 @@ Authorized targets only; observe, don't exploit.
   `window.__INITIAL_STATE__` — these expose data shapes and sometimes internal fields.
 - **Auth model:** map the login/token/refresh flow; note session vs JWT, roles, MFA.
 
-### 1d. Data-model reconstruction
+### 1e. Data-model reconstruction
 - Derive entities/fields/relations from real API responses (far better than from UI).
   Cross-check against what screens display. Produce a normalized schema.
 
 ---
 
-## PHASE 2 — Synthesis → `blueprint-out/PLAN.md`
-Write a structured, executive-grade plan. Sections:
-1. **Overview** — product, audience, core value.
+## PHASE 2 — Synthesis → `blueprint-out/PLAN.md` (the PRD + build blueprint)
+Write a structured, executive-grade PRD-and-build-plan: what the product *is* (from 1a docs
+ingestion) fused with what it *actually does* (from 1c–1e recon). Sections:
+1. **Overview** — product, audience, core value, positioning (grounded in the docs/FAQ read).
 2. **Architecture reality** — SSR/SSG/SPA, real API host(s), auth model. OBSERVED.
 3. **Screen inventory** — every screen (public vs behind-login), with coverage %.
-4. **Feature map** — grouped; each tagged OBSERVED/INFERRED.
+4. **Feature map** — grouped; each tagged OBSERVED (seen in app) / DOCUMENTED (stated in
+   docs/FAQ but not yet seen) / INFERRED. A DOCUMENTED-but-not-OBSERVED feature = likely
+   behind login → flag it as a reason to get credentials.
 5. **Discovered API surface** — table: method · path · purpose · auth? · req/res shape ·
    OBSERVED/INFERRED. Include the hidden/undocumented endpoints found in 1c.
 6. **Data model** — Prisma schema + Mermaid ER, sourced from real responses where possible.
