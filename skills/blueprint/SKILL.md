@@ -45,6 +45,8 @@ Every mode produces `PLAN.md`; only `clone` continues past the gate to write cod
    miss — a screen not visited, an endpoint not read, a claim not evidenced?" Close the gap.
 6. **Honesty is the product.** A precise "we can't see the tax engine, budget N weeks" beats
    a confident fabrication every time.
+7. **Depth comes from the domain, not the DOM.** The website is ~15% of a faithful clone; the
+   other 85% is the rules/workflows/edge-cases the product encodes. Phase 0.5 is where you earn it.
 
 ---
 
@@ -66,7 +68,30 @@ Handle any credentials only for this run; never store, log, or echo them back.
 
 ---
 
-## PHASE 1 — Deep reconnaissance (autonomous)
+## PHASE 0.5 — Become a domain expert (research the PROBLEM, not just the product)
+**This is the highest-leverage phase and the one most easily skipped. Do not skip it.** A great
+blueprint's depth comes from understanding the *domain the product operates in* — the rules,
+regulations, workflows, and edge cases it encodes — not from screenshots. The website shows ~15%
+of what a faithful clone must implement; the other 85% is domain knowledge the UI merely hints at.
+
+Given the product's category (from Phase 0), **research the underlying domain until you could
+brief an engineer who has never seen the space.** Use web search / deep research:
+- **The governing rules & regulations** the product must implement correctly. (E.g. an Indian
+  capital-gains tracker encodes: FIFO lot-matching *per demat account*, s.112A grandfathering vs
+  31-Jan-2018 FMV, s.50AA specified funds, indexation regimes, corporate-action cost adjustments,
+  Schedule 112A output, NRI s.115AD. A payroll product encodes tax slabs, PF/ESI, TDS. A lending
+  product encodes RBI norms, KYC, interest-accrual math.) Find the *actual rules*, cite sources.
+- **Domain workflows & personas** — how real users (and the professionals who serve them) actually
+  work: the CA filing for 200 clients, the ops head reconciling custody statements. What's the job?
+- **The hard engines** — the 3–5 computational cores that ARE the product and take years to get
+  right (the tax engine, the import-format library, the matching/pricing/settlement logic). Name
+  them, describe the algorithm each must implement, and rate how hard each is to replicate.
+- **Edge cases & failure modes** practitioners know and casual users don't (mid-year rule changes,
+  buyback dual-entry, physical→demat with no contract note, password-protected statements).
+- **The competitive & regulatory landscape** — adjacent products, what each gets wrong, the
+  compliance perimeter (feeds Phase 2 compliance gate).
+Save to `blueprint-out/recon/domain-brief.md`, every rule/claim tagged with a source. This brief
+is what elevates the plan from "a clone of some screens" to "a spec an expert would respect."
 Go wide, then deep. Record everything into `blueprint-out/recon/`.
 
 ### 1a. Ingest the product's own words FIRST (docs, FAQ, help, pricing, changelog)
@@ -127,53 +152,90 @@ Authorized targets only; observe, don't exploit.
 
 ---
 
-## PHASE 2 — Synthesis → `blueprint-out/PLAN.md` (the PRD + build blueprint)
-Write a structured, executive-grade PRD-and-build-plan: what the product *is* (from 1a docs
-ingestion) fused with what it *actually does* (from 1c–1e recon). Sections:
-1. **Overview** — product, audience, core value, positioning (grounded in the docs/FAQ read).
-2. **Architecture reality** — SSR/SSG/SPA, real API host(s), auth model. OBSERVED.
-3. **Screen inventory** — every screen (public vs behind-login), with coverage %.
-4. **Feature map** — grouped; each tagged OBSERVED (seen in app) / DOCUMENTED (stated in
-   docs/FAQ but not yet seen) / INFERRED. A DOCUMENTED-but-not-OBSERVED feature = likely
-   behind login → flag it as a reason to get credentials.
-5. **Discovered API surface** — table: method · path · purpose · auth? · req/res shape ·
-   OBSERVED/INFERRED. Include the hidden/undocumented endpoints found in 1c.
-6. **Data model** — Prisma schema + Mermaid ER, sourced from real responses where possible.
-7. **Security & exposure findings** — public/unauthenticated data, leaked keys, introspection
-   open, PII exposure, missing authz — each with severity + evidence. (This is the MOM's
-   "security coverage report.") Report only; never exploit.
-8. **Compliance & regulatory gate** — from what was OBSERVED, flag EVERY regime the clone
-   would trigger and must satisfy *before* it can ship. Detect the triggers, map each to its
-   regime, and state the concrete obligations + build items + effort. Common triggers:
-   - takes card/payment data → **PCI-DSS** (tokenization, no raw PAN storage, SAQ scope)
-   - personal data of EU users → **GDPR** · India → **DPDP Act** · California → **CCPA/CPRA**
-     (lawful basis, consent, DSAR/erasure, data-residency, breach notice)
-   - financial / investment product in India → **SEBI** rules + **KYC/AML** (RIA/broker norms)
-   - health data → **HIPAA** · children → **COPPA**
-   - selling B2B / handling customer data → **SOC 2** (controls, audit logs, retention)
-   - cookies / tracking → **ePrivacy / consent banner**
-   Output a table: trigger (observed) → regime → must-build obligations → effort (D-rating) →
-   who owns it. Treat this as a GATE: the builder must acknowledge these obligations knowingly.
-   Compliance is a design-time input (encryption, consent, audit logging, residency, retention
-   are architectural), never a bolt-on. Flag "needs legal review" where you're not certain —
-   you surface obligations, you do not give legal advice.
-8. **System design (to rebuild)** — Mermaid component diagram (client→gateway→services→
-   stores→3rd-parties); recommended, justified tech stack; **scale/user prediction** (users,
-   RPS, data volume, read/write mix, scaling strategy); failure modes for critical paths.
-9. **Backend architecture plan** — services/modules, per-endpoint ownership, business-logic
-   outline, each flagged `reproducible` vs `needs real engineering`; build order.
-10. **Design & aesthetics plan** — critique current UI; propose design tokens + component
-    system (use the `impeccable` skill); asset list to (re)generate.
-11. **Build estimation (headline)** — per-layer effort S/M/L/XL + days (optimistic→realistic,
-    team size); **AI models per job** (Opus: architecture/hard codegen; Sonnet: bulk FE/routes;
-    Haiku: mechanical) with why; **token estimate** (per stage × runs → total); **$ cost**
-    (tokens×price range) + monthly infra run-cost at predicted scale; **build-vs-not verdict**.
-12. **Coverage & gaps** — what's OBSERVED vs INFERRED, what's behind login, what wasn't reached.
+## PHASE 2 — Author the PRD (`blueprint-out/PLAN.md`) — an engineering build-spec, not a summary
+This is the deliverable. Write a **real Product Requirements Document** that fuses what the product
+*is* (Phase 0.5 domain brief + 1a docs) with what it *actually does* (1c–1e recon). It must read
+like a spec a senior team would build from — not a recon dump. **Non-negotiable rigor rules:**
+
+- **Stable requirement IDs.** Every functional requirement gets an ID like `FR-IMP-012`
+  (`FR-<AREA>-<n>`), stable and referenced across sections, indexed in an appendix.
+- **Given/When/Then acceptance** on every *load-bearing* behaviour (the ones where "close" = wrong):
+  `Given <state> · When <action> · Then <observable, testable outcome>`.
+- **Priority × Complexity** on every requirement: Priority `P0` must-have → `P3` later; Complexity
+  `S/M/L/XL`. No requirement without both.
+- **Evidence tags** everywhere: `OBSERVED` (seen in app) / `DOCUMENTED` (in docs, not yet seen) /
+  `SEEN-IN-DEMO` / `DOMAIN` (from 0.5 research) / `INFERRED`. Never present INFERRED as OBSERVED.
+- **Name the hard engines** from Phase 0.5 and specify the algorithm each implements — these are
+  the product; the CRUD around them is not.
+
+**Section structure** (adapt to the domain; keep the spine):
+1. **Executive summary** — what we're building, why it's defensible, the one-paragraph thesis,
+   the 3–5 hard engines, and what "faithful clone, built world-class" means here.
+2. **Problem & context** — the structural pain, the domain rules that make it hard (from 0.5),
+   "why now". This is where domain mastery shows.
+3. **Goals, non-goals & success metrics** — north-star + input + guardrail metrics; explicit
+   non-goals (scope creep is how big builds die).
+4. **Personas & jobs-to-be-done** — each persona: role, JTBD (one italic sentence), key needs.
+5. **Product principles** — the 4–6 rules that arbitrate every later trade-off.
+6. **Scope & release strategy** — phased (v1 / fast-follow / later), tied to priorities.
+7. **Information architecture** — the app's structure, navigation, and any multi-app split.
+8. **Design system** — tokens (color, type, spacing), component inventory, states. Critique the
+   reference UI and raise the bar (use the `impeccable` skill).
+9. **Screen specifications** — per key screen: purpose, layout, states (empty/loading/error/
+   partial), behaviour, and its GWT acceptance. Include a **rendered mockup** (see Phase 2b).
+10. **Functional requirements** — grouped by area, each a table row: `ID · requirement · Priority ·
+    Cx`, with GWT blocks on the load-bearing ones. This is the bulk of the spec.
+11. **Discovered API surface** — table: method · path · purpose · auth? · req/res shape · evidence.
+    Include hidden/undocumented endpoints from 1d.
+12. **Data model & schema** — Prisma schema + Mermaid ER from real responses where possible;
+    call out computed-not-stored fields and integrity rules.
+13. **System architecture** — Mermaid component diagram (client→gateway→services→stores→3rd-party);
+    justified tech stack; **scale/user prediction** (users, RPS, data volume, read/write mix,
+    scaling strategy); failure modes on critical paths.
+14. **Backend architecture plan** — services/modules, per-endpoint ownership, business-logic
+    outline; each flagged `reproducible` vs `needs real engineering`; build order.
+15. **Auth, security & exposure findings** — auth/identity/tenancy model; then public/unauth data,
+    leaked keys, open introspection, PII exposure, missing authz — each with severity + evidence.
+    Report only; never exploit. (The MOM's "security coverage report.")
+16. **Non-functional requirements** — SLOs (latency, availability), reliability/DR, observability,
+    accessibility. Concrete numbers, not adjectives.
+17. **Compliance & regulatory gate** — flag EVERY regime the clone triggers and must satisfy
+    *before* ship. Table: trigger (observed/domain) → regime → must-build obligations → effort
+    (Cx) → owner. Common triggers: card/payment → **PCI-DSS**; EU personal data → **GDPR** · India
+    → **DPDP** · California → **CCPA/CPRA**; Indian investment product → **SEBI** + **KYC/AML**;
+    health → **HIPAA**; children → **COPPA**; B2B customer data → **SOC 2**; tracking → **ePrivacy**.
+    Compliance is a design-time input (encryption, consent, audit logging, residency, retention are
+    architectural), never a bolt-on. Flag "needs legal review" where unsure — surface obligations,
+    don't give legal advice. Treat as a GATE: the builder acknowledges these knowingly.
+18. **Build estimation** — per-layer effort (Cx + days, optimistic→realistic, team size); **AI
+    models per job** (Opus: architecture/hard codegen; Sonnet: bulk FE/routes; Haiku: mechanical)
+    with why; **token estimate** (per stage × runs → total); **$ cost** (tokens×price) + monthly
+    infra run-cost at predicted scale; **build-vs-not verdict**.
+19. **Roadmap & phasing** · **Risks & decisions** — sequenced milestones; key risks + the
+    decisions taken (with rationale) so they aren't re-litigated.
+20. **Appendices** — requirement-ID index, glossary (domain terms), reference datasets, coverage
+    map (OBSERVED vs INFERRED, what's behind login, what wasn't reached).
+
+## PHASE 2b — Render the PRD as a world-class single-file HTML doc (`blueprint-out/PRD.html`)
+The Markdown PLAN.md is the source of truth; the HTML is what gets shared with founders/CEOs.
+**Use the shipped template `prd-template.html`** (in this skill's folder) as the design system and
+component cookbook — do NOT hand-roll CSS. Clone it and fill it with the PLAN.md content:
+- Copy the template's `<style>` block verbatim (theme-aware, print-ready, proven design system).
+- Use its components: `.rid` requirement IDs, `.pill.p-p0` priority pills, `.ac` Given/When/Then
+  blocks, `.tw > table` requirement tables, `.call` callouts (decision/risk/note/sec), `.persona`
+  cards, `.stat` metric cards, `.screen > .mock` **rendered screen mockups**, `figure > svg`
+  Mermaid/architecture diagrams, the `.toc` sidebar + numbered sections.
+- **Rendered mockups matter:** for each key screen, build a `.mock` HTML mockup (not just a
+  screenshot) that shows the *idealized* redesigned screen — this is what makes the doc feel built,
+  not scraped. Keep mockups in the product's own light palette (see `.mock` scope in the template).
+- Keep it a single self-contained `.html` (fonts via CDN link is fine for a local doc). Open it to
+  sanity-check it renders, then it's ready to share or print-to-PDF.
 
 ---
 
 ## GATE — stop and confirm
-Present PLAN.md. Ask: **"Proceed to build? — `all` / `frontend-only` / `api+schema` / refine plan."**
+Present PLAN.md (and `PRD.html` if rendered). Ask: **"Proceed to build? — `all` / `frontend-only` /
+`api+schema` / refine plan."**
 Surface blockers explicitly, including:
 - coverage: "backend is 90% inferred — get me a login to make it real",
 - **compliance: name every triggered regime and ask the human to acknowledge the obligations
