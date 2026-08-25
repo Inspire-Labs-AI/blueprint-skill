@@ -82,6 +82,21 @@ instead of guessing from the UI:
 - This corpus seeds the feature map and PRD (Phase 2) and tells recon what to go hunt for
   (a documented feature with no screen you found = a screen behind login or a gap to chase).
 
+### 1a-ext. Then see what the world shows (video demos, reviews, third-party walkthroughs)
+Use web search to find material the vendor didn't write — this is often the ONLY way to see
+the logged-in product and workflows you can't otherwise reach. Collect links, don't just read:
+- **Video demos & walkthroughs:** YouTube/Vimeo product demos, feature deep-dives, "how to use
+  X" tutorials, vendor webinars, conference talks. These reveal the authenticated UI, real data
+  flows, and features gated behind login/paywall. **Save every demo URL** (with a one-line "what
+  it shows" + timestamp of key moments) to `blueprint-out/recon/demos.md` so the human can watch.
+- **Review & comparison sites:** G2, Capterra, TrustRadius, Product Hunt, Reddit/HN threads —
+  for real feature lists, screenshots, limitations, and pricing users report.
+- **Tutorials & integration guides** written by third parties; competitor comparison pages.
+- Extract anything new into `product-knowledge.md` tagged `EXTERNAL` + source; flag features you
+  can *see in a video but not reach live* as `SEEN-IN-DEMO` (strong evidence, still not OBSERVED
+  first-hand — a top reason to request credentials).
+- If no browser/web-search tool is available, say so and list the searches a human should run.
+
 ### 1b. Surface map
 - Visit the URL; enumerate routes from nav, footer, sitemap.xml, robots.txt, and in-page links.
 - Screenshot every reachable screen (full page); save rendered DOM. Note SPA vs SSR/SSG.
