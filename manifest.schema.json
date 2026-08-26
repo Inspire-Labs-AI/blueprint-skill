@@ -1,7 +1,7 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
   "title": "Blueprint manifest — the stage contract",
-  "description": "Single source of truth passed between every Blueprint stage. Each agent reads it, does its job, and writes its slice back. Path is always ./blueprint-out/manifest.json (relative to the run's working dir).",
+  "description": "Single source of truth passed between every Blueprint stage. Each agent reads it, does its job, and writes ONLY its slice back. Path is always ./blueprint-out/manifest.json, relative to the run's working dir. Stages resolve as a dependency graph, not a fixed schedule — see bp-manifest.",
   "type": "object",
   "required": ["target", "status"],
   "properties": {
@@ -9,11 +9,11 @@
       "type": "object",
       "required": ["url"],
       "properties": {
-        "url": { "type": "string", "description": "Product being cloned" },
-        "extra_urls": { "type": "array", "items": { "type": "string" } },
+        "url": { "type": "string", "description": "The product being reconstructed" },
+        "extra_urls": { "type": "array", "items": { "type": "string" }, "description": "App subdomains etc. Check for app./my./dashboard. — crawling only the marketing site is the top cause of an empty run." },
         "auth": {
           "type": ["object", "null"],
-          "description": "Present ONLY for authorized targets. Enables live API/DB capture.",
+          "description": "Non-null ONLY when the human has confirmed authorization. Its presence unlocks authenticated capture. No stage sets this itself.",
           "properties": {
             "authorized": { "type": "boolean" },
             "login_url": { "type": "string" },
@@ -22,102 +22,407 @@
         }
       }
     },
-    "recon": {
-      "type": "object",
-      "description": "Stage 0 output",
-      "properties": {
-        "screenshots": { "type": "array", "items": { "type": "string" }, "description": "Paths under blueprint-out/recon/" },
-        "har": { "type": "string", "description": "Captured network traffic file" },
-        "dom": { "type": "string" },
-        "routes": { "type": "array", "items": { "type": "string" } }
-      }
+    "mode": {
+      "enum": ["explore", "research", "prd", "build", "ask"],
+      "description": "Which deliverable this run is for. Decides the target stage; prerequisites are resolved from the dependency graph."
     },
-    "intel": {
+    "goal": { "type": "string", "default": "functional parity + add-ons" },
+    "question": { "type": "string", "description": "For mode=ask: the question being answered." },
+
+    "domain": {
       "type": "object",
-      "description": "Stage 1 output (saas-reverse)",
+      "description": "Stage 0 (bp-domain) — the rules of the problem space, cited. Runs BEFORE looking at the product.",
       "properties": {
-        "feature_map": { "type": "array", "items": { "type": "string" } },
-        "tech_stack": { "type": "object" },
-        "priorities": { "type": "array", "items": { "type": "string" } },
-        "moat": { "type": "string" },
-        "build_prompt": { "type": "string" }
-      }
-    },
-    "database": {
-      "type": "object",
-      "description": "Stage 2 output (screenshot2sql / dba-mcp)",
-      "properties": {
-        "schema_prisma": { "type": "string" },
-        "schema_sql": { "type": "string" },
-        "er_diagram": { "type": "string" },
-        "tables": { "type": "array", "items": { "type": "string" } },
-        "replicated": { "type": "boolean", "description": "true if dba-mcp replicate_database ran (authorized only)" }
-      }
-    },
-    "api": {
-      "type": "object",
-      "description": "Stage 3 output (reverse-api-engineer / Integuru)",
-      "properties": {
-        "endpoints": { "type": "array", "items": { "type": "object" } },
-        "client_path": { "type": "string" },
-        "language": { "type": "string", "default": "typescript" },
-        "auth_flow": { "type": "string" },
-        "live": { "type": "boolean", "description": "true = client hits real endpoints (authorized), false = stubbed" }
-      }
-    },
-    "dataflow": {
-      "type": "object",
-      "description": "Stage 4 output (dataflow-mapper) — the end-to-end map. THE core artifact: correlates every UI element to the data it shows, the API endpoint that serves it, and the DB table(s) behind it. Built by fusing recon + intel + database + api, even when only screenshots were available (endpoints/tables become inferred, flagged as such).",
-      "properties": {
-        "map": {
+        "brief": { "type": "string" },
+        "glossary": { "type": "string", "description": "Binding vocabulary for every later stage, including the UI" },
+        "hunt_list": { "type": "string", "description": "Per-stage checklist of what to go find. This is what makes recon hunt instead of crawl." },
+        "jurisdiction": { "type": "array", "items": { "type": "string" } },
+        "rules_cited": { "type": "integer" },
+        "hard_engines": {
           "type": "array",
-          "description": "One entry per UI element / data surface.",
           "items": {
             "type": "object",
             "properties": {
-              "ui_element": { "type": "string", "description": "e.g. 'dashboard revenue card', 'orders table row'" },
-              "screen": { "type": "string", "description": "which screenshot/route it lives on" },
-              "data_fields": { "type": "array", "items": { "type": "string" }, "description": "fields shown, e.g. ['amount','currency','created_at']" },
-              "api_endpoint": { "type": "string", "description": "GET /api/v1/... — real (from HAR) or inferred" },
-              "db_tables": { "type": "array", "items": { "type": "string" } },
-              "confidence": { "enum": ["observed", "inferred"], "description": "observed = seen in HAR/DOM; inferred = LLM guess from screenshot" }
+              "name": { "type": "string" },
+              "one_liner": { "type": "string" },
+              "difficulty": { "enum": ["S", "M", "L", "XL"] },
+              "rule_claims": { "type": "array", "items": { "type": "string" } }
             }
           }
         },
-        "diagram": { "type": "string", "description": "Path to a Mermaid flowchart: UI -> API -> DB" }
+        "compliance_regimes": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "regime": { "type": "string" },
+              "trigger": { "type": "string" },
+              "architectural": { "type": "boolean", "description": "true = must be designed in, not bolted on" },
+              "claim": { "type": "string" }
+            }
+          }
+        },
+        "unverified_rules": { "type": "array", "items": { "type": "string" }, "description": "Rules found only in secondary sources. Honest gap list." }
       }
     },
+
+    "intel": {
+      "type": "object",
+      "description": "Stage 1 (bp-intel) — positioning + BEHAVIOURAL feature inventory. Feature names are not acceptable output.",
+      "properties": {
+        "features": { "type": "string" },
+        "positioning": { "type": "string" },
+        "demos": { "type": "string", "description": "Video URLs with mm:ss timestamps — often the only view of the logged-in product" },
+        "reconciliation": { "type": "string", "description": "Domain rules vs features, both directions" },
+        "feature_ids": { "type": "array", "items": { "type": "string" }, "description": "F-<AREA>-<n>. Stable; never renumbered downstream." },
+        "feature_count": { "type": "integer" },
+        "behind_login_count": { "type": "integer" },
+        "tech_signals": {
+          "type": "array",
+          "description": "Infrastructure hints for bp-datastore — subprocessor lists, job postings, status-page vendors, conference talks. Stage 4 depends on this and cannot easily re-find it.",
+          "items": {
+            "type": "object",
+            "properties": { "signal": { "type": "string" }, "claim": { "type": "string" }, "for": { "type": "string" } }
+          }
+        },
+        "pricing_tiers": { "type": "array", "items": { "type": "object" } },
+        "moat": { "type": "string" }
+      }
+    },
+
+    "recon": {
+      "type": "object",
+      "description": "Stage 2 (bp-recon) — the ONLY stage that can produce OBSERVED evidence. Everything downstream is limited by what is saved here.",
+      "properties": {
+        "shots_dir": { "type": "string" },
+        "dom_dir": { "type": "string" },
+        "har": { "type": "string" },
+        "bundles_dir": { "type": "string", "description": "JS + source maps — the product's source with the names removed" },
+        "samples_dir": { "type": "string", "description": "Raw response bodies, ids, pagination, errors" },
+        "coverage": { "type": "string" },
+        "routes": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "url": { "type": "string" },
+              "status": { "enum": ["reached", "behind-auth", "not-found", "blocked"] },
+              "shot": { "type": "string" },
+              "dom": { "type": "string" }
+            }
+          }
+        },
+        "authenticated": { "type": "boolean" },
+        "hunt_list_closed": {
+          "type": "object",
+          "properties": { "found": { "type": "integer" }, "not_found": { "type": "integer" }, "blocked": { "type": "integer" } }
+        },
+        "endpoints_seen": { "type": "integer" },
+        "bundle_findings": { "type": "object" },
+        "security_findings": { "type": "array", "items": { "type": "object" } }
+      }
+    },
+
+    "api": {
+      "type": "object",
+      "description": "Stage 3 (bp-reverse-api) — proven contracts, not a list of URLs.",
+      "properties": {
+        "endpoints_doc": { "type": "string" },
+        "client_path": { "type": "string" },
+        "language": { "type": "string", "default": "typescript" },
+        "live": { "type": "boolean", "description": "true ONLY if the client hits real verified endpoints. Any stub means false." },
+        "endpoints": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": { "type": "string" },
+              "method": { "type": "string" },
+              "path": { "type": "string" },
+              "feature": { "type": "string" },
+              "auth": { "type": "string" },
+              "grade": { "enum": ["OBSERVED", "INFERRED"] },
+              "called": { "type": "boolean", "description": "false = found as a string in a bundle but never invoked" },
+              "verified": { "type": "boolean" },
+              "async": { "type": "boolean" },
+              "anchors": { "type": "array", "items": { "type": "string" } }
+            }
+          }
+        },
+        "counts": { "type": "object" },
+        "auth": { "type": "object", "description": "scheme, refresh, roles, tenancy_claim — tenancy_claim feeds the datastore stage" },
+        "pagination": { "type": "object", "description": "style + cursor_decodes_to — decoded cursors hand over the primary index" },
+        "server_side_engines": { "type": "array", "items": { "type": "string" }, "description": "Computations whose inputs go up and only results come back — unobservable, and a first-order finding for bp-engines" },
+        "security_findings": { "type": "array", "items": { "type": "string" } }
+      }
+    },
+
+    "datastore": {
+      "type": "object",
+      "description": "Stage 4 (bp-datastore) — what they store data in, and in what shape. Never derived from screenshots.",
+      "properties": {
+        "technology": {
+          "type": "object",
+          "properties": {
+            "primary": {
+              "type": "object",
+              "properties": {
+                "engine": { "type": "string", "description": "Name it. 'Some kind of database' is not an answer." },
+                "hosting": { "type": "string" },
+                "confidence": { "enum": ["low", "medium", "high"] },
+                "signals": { "type": "array", "items": { "type": "string" }, "description": "Claim ids from the signal table" }
+              }
+            },
+            "supporting": { "type": "array", "items": { "type": "object" }, "description": "cache / search / queue / blob / warehouse / time-series" },
+            "cloud": { "type": "string" }
+          }
+        },
+        "schema_prisma": { "type": "string" },
+        "schema_sql": { "type": "string" },
+        "er_diagram": { "type": "string" },
+        "entities": { "type": "array", "items": { "type": "object" } },
+        "counts": { "type": "object", "description": "entities, fields_observed, fields_derived, fields_assumed" },
+        "indexes": { "type": "array", "items": { "type": "object" }, "description": "Each tied to an observed query parameter or unique-constraint error" },
+        "computed_not_stored": { "type": "array", "items": { "type": "string" }, "description": "The biggest schema decision in most products — decides whether engines run on read or write" },
+        "tenancy": { "type": "object" },
+        "scale_estimate": { "type": "object", "description": "users, peak_multiplier, data_volume, read_write — arithmetic must be shown in reasoning.md" },
+        "our_recommendation": { "type": "object" }
+      }
+    },
+
+    "engines": {
+      "type": "object",
+      "description": "Stage 5 (bp-engines) — the computational cores that ARE the product.",
+      "properties": {
+        "doc": { "type": "string" },
+        "golden_dir": { "type": "string", "description": "Test vectors. bp-assemble runs these — this is what makes 'it compiles' stop being success." },
+        "engines": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": { "type": "string" },
+              "name": { "type": "string" },
+              "difficulty": { "enum": ["S", "M", "L", "XL"] },
+              "rules": { "type": "integer" },
+              "edge_cases": { "type": "integer" },
+              "golden_tests": { "type": "integer" },
+              "observability": { "enum": ["observed", "partial", "inferred"] },
+              "server_side": { "type": "boolean" },
+              "rule_claims": { "type": "array", "items": { "type": "string" } },
+              "verified_against_observed": { "type": "boolean" },
+              "reference_data_needed": { "type": "array", "items": { "type": "string" } },
+              "estimate_days": { "type": "object" }
+            }
+          }
+        },
+        "total_golden_tests": { "type": "integer" },
+        "mismatches_found": { "type": "array", "items": { "type": "object" }, "description": "Spec vs their observed output. A mismatch traced to THEIR error is a correctness gap — the most defensible add-on there is." }
+      }
+    },
+
+    "gaps": {
+      "type": "object",
+      "description": "Stage 6 (bp-gaps) — where they fall short, and what we build instead. This is why the build is worth doing.",
+      "properties": {
+        "doc": { "type": "string" },
+        "addons": { "type": "string" },
+        "gaps": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": { "type": "string" },
+              "title": { "type": "string" },
+              "severity": { "enum": ["low", "medium", "high", "critical"] },
+              "frequency": { "enum": ["rare", "occasional", "common"] },
+              "type": { "enum": ["table-stakes", "differentiator", "structural"] },
+              "still_true": { "type": "boolean", "description": "Verified against the CURRENT product. A fixed complaint is not a gap." },
+              "effort": { "enum": ["S", "M", "L", "XL"] },
+              "requirement": { "type": "string" },
+              "sources": { "type": "array", "items": { "type": "string" } }
+            }
+          }
+        },
+        "counts": { "type": "object" },
+        "correctness_gaps": { "type": "array", "items": { "type": "object" } },
+        "wedge": { "type": "string" },
+        "verdict": { "enum": ["clear wedge", "parity play", "no clear opening"] }
+      }
+    },
+
+    "dataflow": {
+      "type": "object",
+      "description": "Stage 7 (bp-dataflow) — the wiring map. Supporting implementation artifact; the mechanism lives in engines, not here.",
+      "properties": {
+        "map": { "type": "string" },
+        "diagram": { "type": "string" },
+        "entries": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "screen": { "type": "string" },
+              "component": { "type": "string" },
+              "fields": { "type": "array", "items": { "type": "string" } },
+              "endpoint": { "type": "string" },
+              "stores": { "type": "array", "items": { "type": "string" } },
+              "confidence": { "enum": ["observed", "inferred"] },
+              "anchors": { "type": "array", "items": { "type": "string" } }
+            }
+          }
+        },
+        "counts": { "type": "object" },
+        "waterfalls": { "type": "array", "items": { "type": "object" }, "description": "Serialised request chains — the main cause of slow screens, and a free win for our build" },
+        "client_computed_fields": { "type": "array", "items": { "type": "string" } },
+        "unrendered_fields": { "type": "array", "items": { "type": "object" } }
+      }
+    },
+
+    "ux": {
+      "type": "object",
+      "description": "Stage 8 (bp-ux) — every feature delivered better, with no relearning cost. Specified from behaviour, never traced from screenshots.",
+      "properties": {
+        "ia_map": { "type": "string" },
+        "screens": { "type": "string" },
+        "design_system": { "type": "string" },
+        "vocabulary": { "type": "string", "description": "Binding on every later stage — labels, copy, errors, client, schema" },
+        "screens_specified": { "type": "integer" },
+        "feature_coverage": {
+          "type": "object",
+          "description": "Parity is functional. A non-empty 'unmapped' is a parity failure and must be justified.",
+          "properties": {
+            "total": { "type": "integer" },
+            "mapped": { "type": "integer" },
+            "unmapped": { "type": "array", "items": { "type": "string" } }
+          }
+        },
+        "shift_cost": {
+          "type": "object",
+          "description": "The familiarity budget. Aim for 0–3 'high' rows in the whole product.",
+          "properties": {
+            "none": { "type": "integer" }, "low": { "type": "integer" },
+            "medium": { "type": "integer" }, "high": { "type": "integer" }
+          }
+        },
+        "high_shifts": { "type": "array", "items": { "type": "object" }, "description": "Each needs a justification and a bridge affordance" },
+        "states_specified": { "type": "integer" },
+        "flow_improvements": { "type": "array", "items": { "type": "object" } }
+      }
+    },
+
+    "spec": {
+      "type": "object",
+      "description": "Stage 9 (bp-blueprint) — the deliverable for the requested mode.",
+      "properties": {
+        "mode": { "type": "string" },
+        "plan": { "type": "string" },
+        "prd_html": { "type": "string" },
+        "requirements": { "type": "object" },
+        "coverage": { "type": "object", "description": "Claims by grade, behind_login, never_reached, single_anchor_claims. This is what makes the document trustworthy — never soften it." },
+        "feature_parity": { "type": "object" },
+        "critic": { "type": "object", "description": "Comprehension critic run + issues found/fixed" },
+        "estimate": { "type": "object" },
+        "verdict": { "type": "string" }
+      }
+    },
+
     "frontend": {
       "type": "object",
-      "description": "Stage 5 output (ai-website-cloner-template), consumes dataflow.map so each section knows what data it needs",
+      "description": "Stage 10 (bp-frontend-build) — post-gate.",
       "properties": {
         "repo_path": { "type": "string" },
         "framework": { "type": "string", "default": "next" },
-        "sections": { "type": "array", "items": { "type": "string" } },
-        "routes": { "type": "array", "items": { "type": "string" } }
+        "routes": { "type": "array", "items": { "type": "string" } },
+        "screens": { "type": "object" },
+        "states": { "type": "object", "description": "specified vs implemented — a screen with only its success state is not done" },
+        "wired": { "type": "object" },
+        "waterfalls_fixed": { "type": "integer" },
+        "build_passes": { "type": "boolean" },
+        "typecheck_passes": { "type": "boolean" }
       }
     },
+
     "assembly": {
       "type": "object",
-      "description": "Stage 5 output (assembler)",
+      "description": "Stage 11 (bp-assemble) — post-gate. Success is CONFORMANCE, not compilation.",
       "properties": {
         "repo_path": { "type": "string" },
-        "wired": { "type": "boolean" },
         "run_cmd": { "type": "string" },
-        "notes": { "type": "string" }
+        "wired": { "type": "boolean" },
+        "build_passes": { "type": "boolean" },
+        "typecheck_passes": { "type": "boolean" },
+        "conformance": {
+          "type": "object",
+          "description": "Golden vectors run against the implementation. The headline number.",
+          "properties": {
+            "total": { "type": "integer" }, "passed": { "type": "integer" },
+            "failed": { "type": "integer" }, "not_implemented": { "type": "integer" },
+            "by_engine": { "type": "array", "items": { "type": "object" } }
+          }
+        },
+        "engines_implemented": { "type": "array", "items": { "type": "string" } },
+        "engines_stubbed": { "type": "array", "items": { "type": "string" }, "description": "Stubs throw. Never return a plausible wrong number." },
+        "mock_routes": { "type": "integer" },
+        "real_routes": { "type": "integer" },
+        "reference_data_missing": { "type": "array", "items": { "type": "string" } },
+        "honest_summary": { "type": "string", "description": "What the user reads first. Includes what is stubbed and what failed." }
       }
     },
+
+    "gate": {
+      "type": "object",
+      "description": "Human approval. Stages 10-11 refuse to run while approved is false. Only a human answer flips it.",
+      "properties": {
+        "approved": { "type": "boolean", "default": false },
+        "scope": { "enum": ["all", "frontend-only", "api+schema", null] },
+        "compliance_acknowledged": { "type": "array", "items": { "type": "string" } },
+        "answered_at": { "type": "string" }
+      }
+    },
+
+    "disputes": {
+      "type": "array",
+      "description": "A stage that believes an upstream slice is wrong records it here. It NEVER overwrites another stage's slice.",
+      "items": {
+        "type": "object",
+        "properties": {
+          "stage": { "type": "string" }, "path": { "type": "string" },
+          "upstream_value": {}, "your_value": {},
+          "reasoning": { "type": "string" },
+          "claim_ids": { "type": "array", "items": { "type": "string" } }
+        }
+      }
+    },
+
+    "errors": {
+      "type": "object",
+      "description": "Per-stage failure detail: what was tried, what happened, what would unblock it. A 'failed' with no explanation is the same as lying.",
+      "additionalProperties": { "type": "string" }
+    },
+
+    "depth": {
+      "type": "object",
+      "description": "How deeply each stage was actually run. A later stage needing more than 'shallow' may request a re-run at greater depth.",
+      "additionalProperties": { "enum": ["shallow", "standard", "deep"] }
+    },
+
     "status": {
       "type": "object",
-      "description": "Per-stage state so the workflow can resume and the supervisor can see progress.",
+      "description": "Per-stage state so runs resume and the supervisor can see progress. Stages resolve as a dependency graph — most runs do not execute all twelve.",
       "properties": {
-        "recon":    { "enum": ["pending", "running", "done", "failed"] },
-        "intel":    { "enum": ["pending", "running", "done", "failed"] },
-        "database": { "enum": ["pending", "running", "done", "failed"] },
-        "api":      { "enum": ["pending", "running", "done", "failed"] },
-        "dataflow": { "enum": ["pending", "running", "done", "failed"] },
-        "frontend": { "enum": ["pending", "running", "done", "failed"] },
-        "assembly": { "enum": ["pending", "running", "done", "failed"] }
+        "domain":    { "enum": ["pending", "running", "done", "failed", "skipped"] },
+        "intel":     { "enum": ["pending", "running", "done", "failed", "skipped"] },
+        "recon":     { "enum": ["pending", "running", "done", "failed", "skipped"] },
+        "api":       { "enum": ["pending", "running", "done", "failed", "skipped"] },
+        "datastore": { "enum": ["pending", "running", "done", "failed", "skipped"] },
+        "engines":   { "enum": ["pending", "running", "done", "failed", "skipped"] },
+        "gaps":      { "enum": ["pending", "running", "done", "failed", "skipped"] },
+        "dataflow":  { "enum": ["pending", "running", "done", "failed", "skipped"] },
+        "ux":        { "enum": ["pending", "running", "done", "failed", "skipped"] },
+        "spec":      { "enum": ["pending", "running", "done", "failed", "skipped"] },
+        "frontend":  { "enum": ["pending", "running", "done", "failed", "skipped"] },
+        "assembly":  { "enum": ["pending", "running", "done", "failed", "skipped"] }
       }
     }
   }

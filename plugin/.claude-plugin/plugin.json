@@ -1,7 +1,7 @@
 {
   "name": "blueprint",
-  "version": "0.1.0",
-  "description": "Plan-first web-app cloner. /blueprint <url> crawls a live product, captures its real network APIs, and produces a plan + system design + effort/token/$ estimate, then builds the clone. Honest: tags observed vs inferred, never fabricates a backend it didn't capture.",
+  "version": "0.2.0",
+  "description": "Understand a product completely, then surpass it. /blueprint <url> researches the domain rules, captures the real API traffic, identifies the datastore from public engineering evidence, specifies the computational engines with worked examples, finds where the incumbent falls short, and produces a spec at functional parity plus add-ons. Every claim carries an anchor to a captured artifact; INFERRED is never presented as OBSERVED.",
   "author": { "name": "Jyothi Kumar" },
-  "keywords": ["clone", "reverse-engineering", "blueprint", "playwright"]
+  "keywords": ["reverse-engineering", "blueprint", "prd", "competitive-analysis", "playwright", "product-spec"]
 }
