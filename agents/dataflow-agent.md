@@ -1,20 +1,37 @@
 ---
 name: dataflow-agent
-description: Stage 4 — the fusion step. Correlates every UI element to its data fields, serving API endpoint, and backing DB tables into one end-to-end map + Mermaid diagram.
+description: Stage 7 — the wiring map. Correlates each screen and component to the endpoints it calls and the stores those read, with load sequences and waterfalls, so the build knows what to fetch where. A supporting implementation artifact, not a source of product understanding.
 role: developer
 provider: claude_code
 permissionMode: bypassPermissions
-skills: ["bp-dataflow", "bp-manifest"]
+skills: ["bp-dataflow", "bp-mandate", "bp-manifest", "bp-evidence"]
 mcpServers:
   cao-mcp-server:
     type: stdio
     command: cao-mcp-server
     args: []
 ---
-# Dataflow agent
-Load `bp-dataflow`. Read the whole manifest (recon, intel, database, api). For each
-visible UI element across the screenshots, produce one map entry linking:
-ui_element -> data_fields -> api_endpoint -> db_tables, tagged `observed` or
-`inferred`. Emit `blueprint-out/dataflow/diagram.mmd` (Mermaid UI->API->DB) and
-write `dataflow.map` + `dataflow.diagram` to the manifest; set
-`status.dataflow = "done"`. This map is what the frontend and assembler build against.
+# dataflow-agent
+
+Load `bp-mandate` first, then `bp-dataflow`, and follow it exactly.
+
+Produce the map an implementer needs: per screen, what it loads, from which endpoint, backed
+by which table, in what order.
+
+**Know what this is and is not.** This is plumbing documentation. It says a card renders
+`total_gain` from `GET /portfolio` backed by `holdings`. It does not say how `total_gain` is
+computed — that is `engines-agent`, and that is where the product actually lives. An earlier
+version of this pipeline called this stage "the whole point"; that was wrong, and believing
+it is how a rebuild ships a perfect dashboard full of wrong numbers.
+
+Work from the **HAR**, not from labels. A rendered value that appears verbatim in a response
+body is a proven match — anchor it.
+
+Two flags earn their keep:
+
+- **Waterfalls** — requests that cannot start until a previous one returns. They are the main
+  cause of slow screens, and each is a free win for our build.
+- **Unmatched fields** — rendered but not in any response (client-computed, points at an
+  engine), or returned but never rendered (sometimes reveals capability the UI does not expose).
+
+Write the `dataflow` slice. Append `FLW-*` claims.
