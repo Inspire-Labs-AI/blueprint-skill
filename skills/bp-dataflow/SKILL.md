@@ -1,25 +1,109 @@
 ---
 name: bp-dataflow
-description: Stage 4 fusion. Correlates every UI element to its data fields, serving API endpoint, and backing DB tables into one end-to-end map + Mermaid diagram.
+description: Stage 7 — the wiring map. Correlates each screen and component to the endpoints it calls and the stores those read, so the build knows what to fetch where. A supporting artifact for implementation, not a source of product understanding - the mechanism lives in bp-engines, the contracts in bp-reverse-api, the storage in bp-datastore.
 ---
-# bp-dataflow — the fusion step (the whole point)
+# bp-dataflow — the wiring map
 
-No external tool — this is pure correlation reasoning over the manifest. Read
-`recon` (screenshots + DOM), `intel` (features), `database` (tables/columns), `api`
-(endpoints). For each visible UI surface, answer: what data does it show → which
-endpoint serves that data → which table(s) store it.
+## Your job
+
+Produce the map an implementer needs: **for each screen, what does it load, from which
+endpoint, backed by which table or collection, and in what order.**
+
+Know what this is and is not. This is **plumbing documentation**. It says a card renders
+`total_gain` from `GET /portfolio` backed by `holdings`. It does not say how `total_gain` is
+computed — that is `bp-engines`, and that is where the product actually lives.
+
+An earlier version of this pipeline called this stage "the whole point". It was wrong, and
+believing it is how a rebuild ends up with a perfect-looking dashboard full of wrong numbers.
+This stage is useful and it is not the value.
+
+## Load first
+
+- **`bp-mandate`**, `bp-manifest`, `bp-evidence` (your prefix is `FLW`)
+- `blueprint-out/recon/` — screenshots, DOM, HAR (**the HAR tells you what each screen
+  actually loaded — use it, do not guess from labels**)
+- `blueprint-out/api/endpoints.md`
+- `blueprint-out/datastore/schema.prisma` + `field-provenance.md`
+- `blueprint-out/ux/screens.md` — if `ux` has run, map to **our** screens; otherwise theirs
+
+---
 
 ## Method
-1. Enumerate UI elements per screenshot (cards, tables, forms, lists, detail views).
-2. For each, list the `data_fields` it renders (read labels/values from DOM).
-3. Match fields to an `api_endpoint` — `observed` if that endpoint appears in the
-   HAR/DOM fetches, else `inferred` from naming + REST conventions.
-4. Match fields to `db_tables` from the Stage-2 schema (column-name overlap).
-5. Tag each entry `observed` or `inferred`.
+
+1. **Per screen, read the HAR.** Filter the capture by the page's navigation and list every
+   request it fired, in order, with its timing. That is the ground truth of what the screen
+   loads — far better than inspecting labels.
+2. **Per component**, list the fields it renders (from the DOM) and match them to fields in
+   the response bodies. Match by name first, then by value — **if a rendered value appears
+   verbatim in a response body, that is a proven match**; anchor it.
+3. **Map fields to storage** using `field-provenance.md`. Mark fields that are computed and
+   not stored — those point at an engine.
+4. **Record the load sequence**: what is fetched on mount, what is deferred, what is
+   parallel, what waterfalls (a request that cannot start until a previous one returns).
+   **Waterfalls are the main cause of slow screens** — note each one; it is a `bp-gaps` input
+   and a design constraint for our build.
+5. **Note over- and under-fetching**: a list endpoint returning 60 fields to render 4, or a
+   screen making 30 calls that one endpoint could serve. Both are build decisions for us.
+6. **Flag every unmatched field**, both directions:
+   - Rendered but not found in any response → computed client-side, or from an endpoint you
+     did not capture. Say which.
+   - Returned but never rendered → an unused field, a hidden feature, or over-fetching.
+     Sometimes a returned-but-unrendered field reveals a capability the UI does not expose.
+7. **Draw the diagram** — Mermaid `flowchart LR`, screen → endpoint → store. Group by area.
+   If the product is large, one diagram per area beats one unreadable diagram.
+
+---
+
+## Proof requirements
+
+- A mapping is `observed` when the endpoint appears in the HAR for that screen **and** the
+  rendered value appears in its response. Anchor both.
+- A mapping guessed from field names and REST conventions is `inferred`. Say so per row.
+- Table mappings come from `field-provenance.md`, not from name similarity.
+
+---
 
 ## Emit
-- `blueprint-out/dataflow/diagram.mmd` — Mermaid `flowchart LR` of UI -> API -> DB.
-- Manifest `dataflow.map` (array) + `dataflow.diagram` (path); `status.dataflow="done"`.
 
-This map is the build spec for Stage 5/6 — every frontend section reads it to know
-what data to fetch and from where.
+| File | Contents |
+|---|---|
+| `blueprint-out/dataflow/map.md` | The screen → component → fields → endpoint → store table |
+| `blueprint-out/dataflow/diagram.mmd` | Mermaid flowchart(s) |
+| `blueprint-out/dataflow/load-sequences.md` | Per screen: order, parallelism, waterfalls, timings |
+| `blueprint-out/evidence/ledger.jsonl` | Append `FLW-*` |
+
+Manifest slice `dataflow`:
+```jsonc
+"dataflow": {
+  "map":"blueprint-out/dataflow/map.md","diagram":"blueprint-out/dataflow/diagram.mmd",
+  "entries":[{"screen":"/holdings","component":"holdings table","fields":["isin","qty","avg_cost"],
+              "endpoint":"GET /v2/holdings","stores":["holdings"],
+              "confidence":"observed","anchors":["har:recon/traffic.har#288"]}],
+  "counts":{"observed":142,"inferred":31},
+  "waterfalls":[{"screen":"/reports/capital-gains","depth":3,"total_ms":4200,"claim":"FLW-061"}],
+  "client_computed_fields":["portfolio.day_change_pct"],
+  "unrendered_fields":[{"endpoint":"GET /v2/holdings","field":"internal_risk_band","note":"never displayed"}]
+}
+```
+Then `status.dataflow = "done"`.
+
+---
+
+## Done when
+
+- [ ] Every captured screen mapped
+- [ ] Every mapping marked `observed` or `inferred`, with anchors on the observed ones
+- [ ] Load sequences recorded; waterfalls identified with timings
+- [ ] Client-computed fields flagged (they point at engines)
+- [ ] Unrendered returned fields flagged (they point at hidden capability)
+- [ ] Diagram renders
+- [ ] Ledger self-check passes
+
+---
+
+## Never
+
+- Never claim this map explains the product. It explains the wiring.
+- Never guess a table from a field name when `field-provenance.md` has the answer.
+- Never mark a mapping `observed` without the HAR entry to back it.
+- Never quietly skip screens that were behind auth — list them as unmapped.
