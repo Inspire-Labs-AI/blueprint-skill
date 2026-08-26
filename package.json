@@ -1,11 +1,29 @@
 {
   "name": "blueprint-skills",
-  "version": "0.1.0",
-  "description": "Plan-first web-app cloner skill + /blueprint command for Claude Code, Cursor, and OpenCode. One command installs into all three.",
-  "bin": { "blueprint-skills": "bin/install.js" },
+  "version": "0.2.0",
+  "description": "Understand a product end to end with proof, then specify how to rebuild it at functional parity plus add-ons. Skill set + /blueprint command for Claude Code, Cursor and OpenCode.",
+  "bin": {
+    "blueprint-skills": "bin/install.js"
+  },
   "type": "module",
-  "files": ["bin/", "skills/blueprint/", "commands/blueprint.md"],
-  "keywords": ["claude-code", "cursor", "opencode", "skill", "slash-command", "clone", "reverse-engineering", "blueprint"],
+  "files": [
+    "bin/",
+    "skills/",
+    "commands/blueprint.md"
+  ],
+  "keywords": [
+    "claude-code",
+    "cursor",
+    "opencode",
+    "skill",
+    "slash-command",
+    "reverse-engineering",
+    "blueprint",
+    "prd",
+    "competitive-analysis"
+  ],
   "license": "MIT",
-  "engines": { "node": ">=18" }
+  "engines": {
+    "node": ">=18"
+  }
 }
