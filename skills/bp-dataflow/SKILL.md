@@ -13,9 +13,20 @@ Know what this is and is not. This is **plumbing documentation**. It says a card
 `total_gain` from `GET /portfolio` backed by `holdings`. It does not say how `total_gain` is
 computed — that is `bp-engines`, and that is where the product actually lives.
 
-An earlier version of this pipeline called this stage "the whole point". It was wrong, and
-believing it is how a rebuild ends up with a perfect-looking dashboard full of wrong numbers.
-This stage is useful and it is not the value.
+Do not mistake this map for the product. Treating the wiring as the meaning is how a rebuild
+ends up with a perfect-looking dashboard full of wrong numbers — the numbers come from the
+engines, not the wiring. This stage is useful, and it is not the value.
+
+## Scope — do only this
+
+- **Deliver:** the wiring map — per screen, what it loads, from which endpoint, backed by
+  which store, in what order.
+- **Do not:** explain how any value is computed (that is `engines`), or redesign the screens
+  (that is `ux`). This is plumbing documentation. When you find a computed field, flag it and
+  point at the engine — do not derive it.
+- **Emit:** the files under `## Emit`, the `dataflow` slice, and `FLW-*` ledger lines.
+- **Stop when:** every captured screen is mapped and marked observed/inferred, with waterfalls
+  noted. This stage is useful and it is not the product's meaning — do not inflate it into one.
 
 ## Load first
 

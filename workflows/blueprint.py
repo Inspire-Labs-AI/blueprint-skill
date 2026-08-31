@@ -29,8 +29,10 @@ ALL_STAGES = ["domain", "intel", "recon", "api", "datastore", "engines",
               "gaps", "dataflow", "ux", "spec", "frontend", "assembly"]
 
 # Which stages each mode needs. Prerequisites are already expanded.
+# `spec` is the writer for EXPLORE.md / RESEARCH.md / PLAN.md, so every deliverable-producing
+# mode must include it — otherwise the run captures evidence and emits no document.
 MODE_STAGES = {
-    "explore":  ["domain", "intel", "recon"],
+    "explore":  ["domain", "intel", "recon", "spec"],
     "research": ["domain", "intel", "recon", "api", "datastore", "engines", "gaps", "spec"],
     "prd":      ["domain", "intel", "recon", "api", "datastore", "engines", "gaps",
                  "dataflow", "ux", "spec"],
@@ -108,29 +110,33 @@ stage("datastore", "datastore-agent",
       "schema from API traffic — never from screenshots — and reason it against the domain, "
       "the user base and the scale.")
 
-# --- engines / gaps / dataflow are independent of each other: fan out ---------
+# --- engines + dataflow are independent of each other: fan out. gaps needs -----
+# --- engines (it walks the engine verification), so it runs AFTER this join. ---
 _fan = [
     ("engines", "engines-agent",
      "Specify the 3-7 computational cores. Per engine: cited rules, step-by-step algorithm, "
      "edge cases, a WORKED EXAMPLE with real numbers whose arithmetic you have checked, and "
      "golden test vectors. Verify your spec against their observed outputs; adjudicate every "
      "mismatch."),
-    ("gaps", "gaps-agent",
-     "Find where they fall short and turn it into the ranked add-on list. Six sources, "
-     "including a rule-by-rule walk of the domain brief. Every gap needs evidence AND an "
-     "answer. Split table stakes from differentiators. State the wedge, or its absence."),
     ("dataflow", "dataflow-agent",
      "Wiring map: screen to endpoint to store, from the HAR. Record load sequences, "
      "waterfalls, client-computed fields and returned-but-unrendered fields."),
 ]
-with ThreadPoolExecutor(max_workers=3) as ex:
+with ThreadPoolExecutor(max_workers=2) as ex:
     futures = [(n, ex.submit(stage, n, p, i)) for n, p, i in _fan]
-# collect: a swallowed exception here would let `ux`/`spec` run on a half-empty manifest
+# collect: a swallowed exception here would let `gaps`/`ux`/`spec` run on a half-empty manifest
 for name, fut in futures:
     try:
         fut.result()
     except Exception as e:
         print(f"[FAIL] {name}: {e}")
+
+# gaps requires engines (per bp-manifest); dispatch it only after the join above.
+stage("gaps", "gaps-agent",
+      "Find where they fall short and turn it into the ranked add-on list. Six sources, "
+      "including a rule-by-rule walk of the domain brief and the engine verification. Every "
+      "gap needs evidence AND an answer. Split table stakes from differentiators. State the "
+      "wedge, or its absence.")
 
 # --- design -------------------------------------------------------------------
 stage("ux", "ux-agent",

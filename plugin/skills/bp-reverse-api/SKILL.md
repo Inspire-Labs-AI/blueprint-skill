@@ -16,6 +16,18 @@ The API is also the best available window into the backend. Field names, nullabi
 nesting, error text and pagination style are what Stage 4 uses to identify the datastore
 and Stage 5 uses to locate the engines. **Be thorough here and both of those get easier.**
 
+## Scope — do only this
+
+- **Deliver:** a per-endpoint contract another engineer could implement against, and a typed
+  client.
+- **Do not:** re-crawl the product (work from what `recon` saved), design the datastore, or
+  specify engine algorithms. When a computation runs server-side and you cannot see it, name
+  it for `engines` and move on — do not reverse the maths here.
+- **Emit:** the files under `## Emit`, the `api` slice, and `API-*`/`SEC-*` ledger lines.
+- **Stop when:** every observed endpoint has request + success + error shapes with anchors,
+  and every inferred one is labelled inferred in the doc, the manifest and the client. An
+  endpoint you cannot anchor is `INFERRED`, never promoted to fill the table.
+
 ## Load first
 
 - **`bp-mandate`** — read it first. You are reading traffic your own browser generated and

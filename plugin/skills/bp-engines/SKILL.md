@@ -18,6 +18,20 @@ The test for whether you have done this: *could someone build this engine from y
 document, run your worked example, and get the same number?* If not, you have written a
 description, not a specification.
 
+## Scope — do only this
+
+- **Deliver:** the 3–7 computational cores, each with its cited rules, algorithm, edge cases,
+  a worked numeric example, and golden test vectors.
+- **Do not:** inventory features (that is `intel`), design screens (that is `ux`), or rank
+  shortfalls (that is `gaps`). CRUD, auth, lists and settings are not engines — if you have
+  found fifteen "engines" you are counting features. Specify the cores; leave the scaffolding.
+- **Emit:** the files under `## Emit`, the golden vectors under `engines/golden/`, the
+  `engines` slice, and `ENG-*` ledger lines.
+- **Stop when:** someone could build each engine from your spec, run your worked example, and
+  get the same number. For a server-side engine you could not observe, that means a spec from
+  the domain rules marked `INFERRED` with fabricated numbers **removed**, not invented to look
+  complete.
+
 ## Load first
 
 - **`bp-mandate`** — read it first. Where an engine runs server-side and you cannot see it,
@@ -176,6 +190,18 @@ against the build.** This is what makes "it compiles" stop being the definition 
 
 Minimum: the worked example, every edge case, both boundaries of every threshold, and one
 malformed-input case per engine.
+
+**Seed vectors from the real inputs, not from tidy fictions.** For a parser or ingest engine,
+the real captured samples in `recon/samples/` (and any real input files the run collected —
+the messy, per-provider, real-world formats) are your highest-value vectors: a parser that
+passes on a clean synthetic row and fails on the actual broker export has not been tested. Use
+the real thing where you have it.
+
+**Name the invariants, and write them as executable assertions.** Beyond per-case vectors,
+state the properties that must hold across *all* operations — the money identity that never
+breaks, the balance that always reconciles, the total that is conserved. These become a
+property test (`bp-assemble`'s invariant gate): a randomised sequence of operations that must
+leave every invariant true. A vector checks one case; an invariant checks the space.
 
 ### 5. Verify against observed behaviour
 

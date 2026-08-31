@@ -22,6 +22,17 @@ Your headline number is **conformance**, not build status.
 Read manifest → if gate.approved !== true → STOP.
 ```
 
+## Scope — do only this
+
+- **Deliver:** one runnable repo, and a conformance report from running every golden vector.
+- **Do not:** run before `gate.approved === true`. Do not report success on a passing build,
+  fake an engine to make the demo look complete, or edit a golden vector's expected value to
+  turn a failure green. Your headline number is conformance, not build status.
+- **Emit:** `blueprint-out/app/`, `CONFORMANCE.md`, and the `assembly` slice.
+- **Stop when:** every engine is either implemented from spec or stubbed with a throwing
+  `NotImplementedError`, the vectors have been run, and `honest_summary` reflects reality
+  including what is stubbed. No engine returns a plausible wrong value.
+
 ## Load first
 
 - **`bp-mandate`**, `bp-manifest`, `bp-evidence`
@@ -85,6 +96,44 @@ For every failure: the vector, expected vs actual, and the diagnosis — is the 
 wrong, or is the spec wrong? **Do not fix a failure by editing the expected value.** If the
 spec is genuinely wrong, that is a finding: fix `engines.md`, note the correction in the
 ledger, and re-run.
+
+### 4b. Parity gates and the parity number — the loop's oracle
+
+Per-engine conformance is necessary and not sufficient. Ship a single **parity number** and a
+set of **gates** so "how close are we?" has a computed answer, not an opinion.
+
+**The parity number** — count, do not estimate. Each term is `passing / specified`, from a
+test result, never a self-report:
+
+```
+parity = features_passing/features_specified · endpoints_conformant/endpoints_contracted ·
+         states_reachable/states_specified · engines_conformant/engines_identified
+```
+
+Report every denominator. A 95% against a spec that is 60% inferred is 95% confidence in a
+partly-guessed target — say so; the parity number rides on the coverage register, not above it.
+
+**Parity gates** — order the build by dependency, not by visibility, and end each phase in a
+**testable condition** that must pass before the next phase starts. In a system where a wrong
+number is worse than a missing feature, correctness debt compounds faster than feature debt,
+so a gate is executable, not a checkbox. Gates come from `bp-engines`' invariants and worked
+examples; write them as real tests. Shapes that work:
+
+- **Invariant gate** — the domain invariants as executable assertions: a randomised sequence
+  of N create/edit/delete operations leaves every invariant true.
+- **Golden-fixture gate** — a realistic seeded fixture (built from the real input samples
+  `recon` captured) reproduces a hand-computed result **to the last unit** — to the paisa, to
+  the cent, to the row.
+- **Negation gate** — a thing that must *not* change stays fixed (the price feed being down
+  changes no realised total; a back-dated insert changes every subsequent day and nothing
+  before it).
+
+**The loop.** A gate that fails is work, not a verdict: diagnose, fix, re-run — the same
+`validator → fix → re-run` loop, now against the gate — until it passes or you can prove it
+cannot (missing reference data, an unobservable engine). Then stop and say which, with the
+parity number as it stands. Never edit a gate's expected value or lower its bar to pass it;
+never mark a phase gated-green while its gate is red. Termination is honest — a plateaued
+parity number with the reason named beats a forced 100%.
 
 ### 5. Verify it runs
 

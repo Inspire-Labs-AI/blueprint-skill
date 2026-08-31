@@ -22,6 +22,17 @@ Two rules keep this honest:
 2. **Every gap needs an answer.** A complaint list is not a deliverable. Each gap ships with
    what we build instead, what it costs, and whether it is table stakes or a differentiator.
 
+## Scope — do only this
+
+- **Deliver:** the ranked add-on list — each gap evidenced, each with what we build instead,
+  its effort, and table-stakes vs differentiator.
+- **Do not:** design the add-on's screens (that is `ux`) or spec its algorithm (that is
+  `engines`). You name the shortfall and the answer at requirement level; you do not build it
+  here. A gap with a complaint but no answer, or an answer with no evidence, is not a finding.
+- **Emit:** the files under `## Emit`, the `gaps` slice, and `GAP-*` ledger lines.
+- **Stop when:** every gap has both evidence and an answer, and the wedge (or its absence) is
+  stated. A complaint list is not this stage's output.
+
 ## Load first
 
 - **`bp-mandate`** — read it first. Reading public reviews and forum posts is ordinary

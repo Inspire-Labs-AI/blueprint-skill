@@ -50,7 +50,9 @@ written since you last read.
 | 11 | `assembly` | `bp-assemble` | `frontend`, `api`, `datastore`, `engines` | Runnable repo + conformance results |
 
 Stages 3 and 4 both depend on `recon` but `datastore` also wants `api`, so run
-`api` first. Stages 5/6/7 are independent of each other and may run concurrently.
+`api` first. Stages 5 (`engines`) and 7 (`dataflow`) are independent and may run
+concurrently; stage 6 (`gaps`) requires `engines`, so it starts once `engines` is `done` —
+it is not a peer of the other two.
 Stage 8 needs `gaps`.
 
 ---

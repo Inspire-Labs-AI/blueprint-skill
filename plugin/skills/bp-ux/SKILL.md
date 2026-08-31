@@ -29,6 +29,18 @@ defaults, bulk operations, accessibility.
 **Do not trace screenshots.** You are designing screens that deliver the *behaviour* from
 `bp-intel` and the *add-ons* from `bp-gaps`, at a quality bar theirs does not meet.
 
+## Scope — do only this
+
+- **Deliver:** the design spec the build works from — IA parity map, locked vocabulary,
+  per-screen specs with every state, design system, shift-cost table.
+- **Do not:** write application code (that is `frontend`), invent features not in `intel` or
+  `gaps`, or rename domain concepts from the glossary. You design every feature that exists;
+  you do not add ones nobody observed. Screens are specified from behaviour, never traced from
+  screenshots.
+- **Emit:** the files under `## Emit`, the `ux` slice, and `UX-*` ledger lines.
+- **Stop when:** every feature maps to a screen and every screen carries all its states, each
+  error with a recovery path. A spec with only success states does not close this stage.
+
 ## Load first
 
 - **`bp-mandate`** — read it first. Deliver a complete design spec; do not hedge it into

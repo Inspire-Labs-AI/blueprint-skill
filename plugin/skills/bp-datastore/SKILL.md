@@ -1,6 +1,6 @@
 ---
 name: bp-datastore
-description: Stage 4 — work out what they actually store data in, and in what shape. Identifies the real database technology from public engineering evidence (job postings, subprocessor lists, status pages, conference talks, response headers, ID formats, pagination style), then reconstructs the schema by inspecting every API request and response and mapping fields back to tables or collections, reasoned against the domain, the user base and the scale. Replaces the old screenshot-to-SQL guess, which could only ever recover the shape of the reports.
+description: Stage 4 — work out what they actually store data in, and in what shape. Identifies the real database technology from public engineering evidence (job postings, subprocessor lists, status pages, conference talks, response headers, ID formats, pagination style), then reconstructs the schema by inspecting every API request and response and mapping fields back to tables or collections, reasoned against the domain, the user base and the scale. The schema is reconstructed from API traffic, not from screenshots — screens show only the shape of the reports.
 ---
 # bp-datastore — what they store, where, and why
 
@@ -20,6 +20,19 @@ chosen well for constraints you do not share.
 **Do not derive the schema from screenshots.** Screens show outputs. Everything computed,
 intermediate, historical, or audit-related never appears on a screen and is invisible to
 that method. You work from the API and from the domain.
+
+## Scope — do only this
+
+- **Deliver:** the named storage technology (with a confidence level) and the reconstructed
+  schema as a graph, plus what *we* should use.
+- **Do not:** re-observe the product or reverse the engines. You reason over `api` and
+  `recon/samples/` — you do not open the browser again. Whether a value is computed by an
+  engine is a fact you record; *how* it is computed is `engines`' job.
+- **Emit:** the files under `## Emit`, the `datastore` slice, and `DS-*` ledger lines.
+- **Stop when:** the technology is named with a signal table behind it, and every schema field
+  traces to a sample, a request, a validation schema, an error, or a stated domain inference.
+  "Some modern datastore" does not close this stage; a named engine with `confidence: low`
+  does.
 
 ## Load first
 

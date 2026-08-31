@@ -16,6 +16,19 @@ the sentence.
 Your value-add is structure, sequencing, judgement about what matters, and honesty about
 what is missing. Not new facts.
 
+## Scope — do only this
+
+- **Deliver:** the single document for the requested mode (`EXPLORE.md` / `RESEARCH.md` /
+  `PLAN.md` + `PRD.html`), assembled from upstream artifacts.
+- **Do not:** produce new facts. You are a synthesiser, not an author — every sentence traces
+  to an upstream artifact and its claim id. A missing stage is a hole you declare, never one
+  you fill from imagination. If you cannot trace a sentence to the ledger, cut it or go get
+  the evidence.
+- **Emit:** the mode's document(s), the `spec` slice, and any `synthesis` notes. You append no
+  new evidence claims of your own.
+- **Stop when:** the document is complete for its mode and the coverage section states plainly
+  what was not reached. Do not smooth over a gap to make the document read whole.
+
 ## Load first
 
 - **`bp-mandate`**, `bp-manifest`, `bp-evidence`

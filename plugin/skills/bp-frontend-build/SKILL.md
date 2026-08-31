@@ -22,6 +22,17 @@ Read manifest → if gate.approved !== true → STOP. Report that the gate is no
 Nothing in this stage runs before the human answers the gate. Then build only what
 `gate.scope` says (`all` / `frontend-only` / `api+schema`).
 
+## Scope — do only this
+
+- **Deliver:** the app UI — every screen `ux` specified, with every state, in the locked
+  vocabulary, on the tokens, wired to the typed client.
+- **Do not:** run before `gate.approved === true`. Do not redesign what `ux` specified, invent
+  copy (the vocabulary file is binding), or implement business logic (that is `assemble`, from
+  `engines`). You build from `ux/screens.md`, never by tracing screenshots.
+- **Emit:** the repo at `blueprint-out/frontend/` and the `frontend` slice.
+- **Stop when:** every specified screen exists with every specified state, build and typecheck
+  pass, and anything unspecified is marked `SPECULATIVE`. A success-only screen is not done.
+
 ## Load first
 
 - **`bp-mandate`**, `bp-manifest`, `bp-evidence`
@@ -46,9 +57,26 @@ Nothing in this stage runs before the human answers the gate. Then build only wh
    (default / hover / focus / active / disabled / loading / error / empty). Getting states
    right at the component level is what makes getting them right at the screen level cheap.
 4. **Routes** from `ia-map.md`, exactly. Same paths, same labels.
-5. **Screens, one at a time.** For each, implement **every state in the spec** — not just
-   the success path. A screen shipped with only its success state is not done, and it is the
-   exact defect this whole project exists to fix.
+
+   **Steps 1–4 are the locked shared contract** — tokens, component inventory, types, routes.
+   They are built once, by you, before any parallel work, and builders treat them as
+   read-only. This boundary is what lets a fleet build without colliding.
+
+4b. **Decompose and dispatch — scale the fleet to the app's size.** A handful of screens: build
+   them yourself, steps 5–11 below. A large app: fan out. Cut the work into units of one
+   screen or one cohesive section, each owning **disjoint files**, and dispatch one builder per
+   unit — each in **its own git worktree/branch**, so no two builders touch the same files.
+   - **Hand each builder its complete spec inline — no guessing.** The unit's screen spec,
+     every state, the exact client methods it calls, its slice of the locked vocabulary, its
+     load sequence. A builder that has to reach outside its brief to understand its task is a
+     builder that will drift; give it everything and it stays in its lane.
+   - **No unit edits another unit's surface**, and none edits the locked contract from
+     steps 1–4. A shared change needed mid-build comes back to you, not sideways between units.
+   - **You own the seams.** You are the orchestrator with full context of the goal; you merge
+     every worktree at the end and resolve conflicts deliberately, not by taking one side blind.
+5. **Screens (the per-unit contract each builder follows).** For each, implement **every
+   state in the spec** — not just the success path. A screen shipped with only its success
+   state is not done, and it is the exact defect this whole project exists to fix.
 6. **Wire to the client.** Use `api/client.ts`. Follow `load-sequences.md`, and **fix the
    waterfalls it identified** — parallelise what they serialised. That is a free win.
    - Endpoints marked `verified` → real calls.

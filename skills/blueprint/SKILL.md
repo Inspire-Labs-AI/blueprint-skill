@@ -231,7 +231,12 @@ Non-negotiable rigor rules:
 9. **Screen specifications** — per screen: purpose, layout, every state, behaviour, GWT
    acceptance, and a rendered mockup.
 10. **Functional requirements** — grouped by area, `ID · requirement · Priority · Cx`, GWT
-    on the load-bearing ones. The bulk of the spec.
+    on the load-bearing ones. The bulk of the spec. **Plus a cross-cutting negative-path &
+    error catalogue** — the failure classes that apply everywhere (input validation,
+    referential integrity, concurrency, partial failure), each with the rule and the exact
+    required behaviour (block vs warn, field vs form, the recovery offered), solved once
+    centrally rather than re-specified per screen. In a system where a wrong number is worse
+    than a crash, the negative paths are load-bearing requirements, not an appendix.
 11. **The engines** — from `bp-engines`. Per engine: what it computes, the algorithm, the
     rules it implements (cited), edge cases, **the worked example**, and the golden test
     cases. The most valuable section in the document.
@@ -254,15 +259,23 @@ Non-negotiable rigor rules:
 19. **Compliance gate** — every regime triggered, its obligations, whether each is
     architectural or procedural, and the effort. Compliance is a design-time input.
     Flag "needs legal review"; surface obligations, do not give legal advice.
-20. **Build estimation** — per-layer effort (Cx + days, optimistic→realistic, team size);
+20. **Build backlog, parity gates & estimation** — the build ordered by **dependency, not
+    visibility**, in phases that each end in a **parity gate**: a testable, executable
+    condition that must pass before the next phase starts (an invariant property test, a
+    golden-fixture result reproduced to the last unit, a negation that must not change).
+    Correctness debt compounds faster than feature debt, so the gate is a test, not a
+    checkbox. Then per-layer effort (Cx + days, optimistic→realistic, team size);
     **model-per-job** (heavy reasoning: architecture, engines, datastore; mid: bulk
     frontend and routes; small: mechanical) with rationale; token estimate; $ cost; monthly
     infra run-cost at predicted scale; build-or-not verdict.
 21. **Roadmap, risks & decisions** — sequenced milestones, key risks, and the decisions
     already taken with their rationale so they are not re-litigated.
 22. **Appendices** — requirement index, domain glossary, **evidence ledger summary**, and
-    the coverage map: what is `OBSERVED` vs `INFERRED`, what is behind login, what was
-    never reached.
+    the **coverage register**: per module, a confidence rating and a status — fully observed ·
+    partially seen · not reached · behind login · a design decision we made rather than
+    observed. Head it "read this before trusting any section": it is the honest map of where
+    the spec is observation and where it is judgement, and a reader who builds from a section
+    without checking its confidence is building on sand.
 
 ### Rendering `PRD.html`
 `PLAN.md` is the source of truth; the HTML is what gets shared. **Use the shipped
