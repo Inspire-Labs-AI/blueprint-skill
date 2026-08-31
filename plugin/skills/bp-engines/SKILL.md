@@ -191,6 +191,18 @@ against the build.** This is what makes "it compiles" stop being the definition 
 Minimum: the worked example, every edge case, both boundaries of every threshold, and one
 malformed-input case per engine.
 
+**Seed vectors from the real inputs, not from tidy fictions.** For a parser or ingest engine,
+the real captured samples in `recon/samples/` (and any real input files the run collected —
+the messy, per-provider, real-world formats) are your highest-value vectors: a parser that
+passes on a clean synthetic row and fails on the actual broker export has not been tested. Use
+the real thing where you have it.
+
+**Name the invariants, and write them as executable assertions.** Beyond per-case vectors,
+state the properties that must hold across *all* operations — the money identity that never
+breaks, the balance that always reconciles, the total that is conserved. These become a
+property test (`bp-assemble`'s invariant gate): a randomised sequence of operations that must
+leave every invariant true. A vector checks one case; an invariant checks the space.
+
 ### 5. Verify against observed behaviour
 
 Where you have real input/output pairs from `recon/samples/responses/`, **run your specified
