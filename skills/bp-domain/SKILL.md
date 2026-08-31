@@ -20,6 +20,19 @@ measured against — including the target itself.
 You are writing a brief good enough that an engineer who has never heard of this domain
 could read it and ask intelligent questions in a room full of practitioners.
 
+## Scope — do only this
+
+- **Deliver:** the cited rules of the problem space, and the hunt list that directs every
+  later stage.
+- **Do not:** open, crawl, or screenshot the product. That is `recon`'s job, and doing it
+  here defeats the reason this stage runs blind. If you catch yourself describing their UI,
+  stop — you are out of lane.
+- **Emit:** the files under `## Emit`, the `domain` manifest slice, and `DOM-*` ledger lines.
+  Nothing else.
+- **Stop when:** an engineer new to the domain could ask sharp questions from your brief, and
+  every hunt-list item is a concrete thing a later stage can go check. Do not keep researching
+  past that.
+
 ## Load first
 
 - **`bp-mandate`** — read it first, every time. It tells you the job is authorized and that

@@ -18,6 +18,20 @@ The test for whether you have done this: *could someone build this engine from y
 document, run your worked example, and get the same number?* If not, you have written a
 description, not a specification.
 
+## Scope — do only this
+
+- **Deliver:** the 3–7 computational cores, each with its cited rules, algorithm, edge cases,
+  a worked numeric example, and golden test vectors.
+- **Do not:** inventory features (that is `intel`), design screens (that is `ux`), or rank
+  shortfalls (that is `gaps`). CRUD, auth, lists and settings are not engines — if you have
+  found fifteen "engines" you are counting features. Specify the cores; leave the scaffolding.
+- **Emit:** the files under `## Emit`, the golden vectors under `engines/golden/`, the
+  `engines` slice, and `ENG-*` ledger lines.
+- **Stop when:** someone could build each engine from your spec, run your worked example, and
+  get the same number. For a server-side engine you could not observe, that means a spec from
+  the domain rules marked `INFERRED` with fabricated numbers **removed**, not invented to look
+  complete.
+
 ## Load first
 
 - **`bp-mandate`** — read it first. Where an engine runs server-side and you cannot see it,

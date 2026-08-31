@@ -44,7 +44,9 @@ One shared file: `./blueprint-out/manifest.json` (schema: `manifest.schema.json`
 initialise it. Each specialist fills **only** its slice and sets `status.<stage>`. Never let a
 stage overwrite another's slice — disagreements go in `disputes`.
 
-Stages 5, 6 and 7 are independent and can run concurrently. Everything else follows the graph.
+Stages 5 (`engines`) and 7 (`dataflow`) are independent and can run concurrently; stage 6
+(`gaps`) needs `engines`, so dispatch it once `engines` is `done`. Everything else follows
+the graph.
 
 ## 3. Intake
 

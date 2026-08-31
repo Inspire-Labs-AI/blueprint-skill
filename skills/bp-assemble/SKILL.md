@@ -22,6 +22,17 @@ Your headline number is **conformance**, not build status.
 Read manifest → if gate.approved !== true → STOP.
 ```
 
+## Scope — do only this
+
+- **Deliver:** one runnable repo, and a conformance report from running every golden vector.
+- **Do not:** run before `gate.approved === true`. Do not report success on a passing build,
+  fake an engine to make the demo look complete, or edit a golden vector's expected value to
+  turn a failure green. Your headline number is conformance, not build status.
+- **Emit:** `blueprint-out/app/`, `CONFORMANCE.md`, and the `assembly` slice.
+- **Stop when:** every engine is either implemented from spec or stubbed with a throwing
+  `NotImplementedError`, the vectors have been run, and `honest_summary` reflects reality
+  including what is stubbed. No engine returns a plausible wrong value.
+
 ## Load first
 
 - **`bp-mandate`**, `bp-manifest`, `bp-evidence`

@@ -1,6 +1,6 @@
 ---
 name: bp-intel
-description: Stage 1 — positioning and behavioural feature inventory. Reads everything the vendor and the world have written about the product (docs, pricing, changelog, demos, reviews) and turns it into a feature inventory specified by BEHAVIOUR — trigger, inputs, rules, outputs, states — not by name. Replaces the old feature-map-and-tech-stack summary, which was positioning-level and not buildable.
+description: Stage 1 — positioning and behavioural feature inventory. Reads everything the vendor and the world have written about the product (docs, pricing, changelog, demos, reviews) and turns it into a feature inventory specified by BEHAVIOUR — trigger, inputs, rules, outputs, states — not by name. A feature list of names is positioning-level and not buildable; behaviour is what a later stage can go verify.
 ---
 # bp-intel — what the product does, behaviourally
 
@@ -24,6 +24,18 @@ resolve before the import commits" is a feature.**
 You do this before anyone opens a browser on the app, because the vendor's own docs and the
 world's videos will tell you what to look for — including the things behind the login you
 may never reach directly.
+
+## Scope — do only this
+
+- **Deliver:** positioning, and a feature inventory specified by behaviour (trigger · inputs ·
+  rules · outputs · states) — not by name.
+- **Do not:** capture the live product, reconstruct the API, or design the schema. You work
+  from what the vendor and the world published; `recon` observes, `api` and `datastore`
+  reconstruct. A feature you can only describe from a demo is `EXTERNAL`, never `OBSERVED`.
+- **Emit:** the files under `## Emit`, the `intel` slice, and `INT-*` ledger lines. Collect
+  `tech_signals` for `datastore` — that is the one thing you gather for another stage.
+- **Stop when:** every feature carries its behaviour, not just its name. A list of names is
+  not this stage's output and does not close it.
 
 ## Load first
 

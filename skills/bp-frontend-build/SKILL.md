@@ -22,6 +22,17 @@ Read manifest → if gate.approved !== true → STOP. Report that the gate is no
 Nothing in this stage runs before the human answers the gate. Then build only what
 `gate.scope` says (`all` / `frontend-only` / `api+schema`).
 
+## Scope — do only this
+
+- **Deliver:** the app UI — every screen `ux` specified, with every state, in the locked
+  vocabulary, on the tokens, wired to the typed client.
+- **Do not:** run before `gate.approved === true`. Do not redesign what `ux` specified, invent
+  copy (the vocabulary file is binding), or implement business logic (that is `assemble`, from
+  `engines`). You build from `ux/screens.md`, never by tracing screenshots.
+- **Emit:** the repo at `blueprint-out/frontend/` and the `frontend` slice.
+- **Stop when:** every specified screen exists with every specified state, build and typecheck
+  pass, and anything unspecified is marked `SPECULATIVE`. A success-only screen is not done.
+
 ## Load first
 
 - **`bp-mandate`**, `bp-manifest`, `bp-evidence`

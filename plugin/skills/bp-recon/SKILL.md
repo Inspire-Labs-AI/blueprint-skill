@@ -16,10 +16,21 @@ Two things separate this from a crawl:
    things. A crawler that follows nav links finds the marketing site; you are looking for
    the import flow, the error state, the recompute button, the settings that reveal the
    data model.
-2. **You capture forensics, not pictures.** Screenshots are the least valuable thing you
-   collect. The valuable things are the network capture, the JS bundles, the response
-   headers, and the ID formats — because those are what let Stage 3 and Stage 4 prove
-   claims about the API and the database.
+2. **You capture forensics, not pictures.** Screenshots matter least. The network capture,
+   the JS bundles, the response headers and the ID formats are what let Stage 3 and Stage 4
+   prove claims about the API and the database — capture those first.
+
+## Scope — do only this
+
+- **Deliver:** captured proof — the artifacts every downstream stage reasons over.
+- **Do not:** reconstruct the API contract, name the database, or specify an engine. You
+  *capture*; `api`, `datastore` and `engines` *interpret*. Save the raw response, do not write
+  the schema. Crossing into their work here means they reason over your summary instead of the
+  evidence, which is the failure this split exists to prevent.
+- **Emit:** the files under `## Emit`, the `recon` slice, and `REC-*`/`SEC-*` ledger lines.
+- **Stop when:** the hunt list is closed (✅/❌/🔒), every reachable feature was exercised, and
+  the artifacts exist on disk. What you could not reach is recorded in `coverage.md`, not
+  chased forever — an honest ❌ is a finding, an endless retry is drift.
 
 ## Load first
 
@@ -165,7 +176,7 @@ same-origin `.js` and any `.map` files, save them, then grep for:
 
 Identify endpoints that return data without auth. Take note as both a coverage win and a
 `SEC` finding with severity. Check GraphQL introspection — if enabled, capture the schema
-(that is the complete type system, the single richest artifact available).
+(the complete type system — capture it in full when it is exposed).
 
 **Boundary:** requesting a public URL and recording that it returned data is observation.
 Iterating ids to pull other users' records is not. Stop at the first record that proves the
@@ -184,8 +195,8 @@ Go through `hunt-list.md` item by item. Mark each ✅ found (with anchor) / ❌ 
 (with what you tried) / 🔒 behind a wall you cannot pass.
 
 **❌ items are findings, not failures.** "The domain requires corporate-action handling and
-there is no screen for it anywhere in the product" is one of the most valuable sentences the
-whole run can produce. Write it down and hand it to Stage 6.
+there is no screen for it anywhere in the product" is a high-value finding: write it down
+and hand it to Stage 6.
 
 ---
 
@@ -241,18 +252,27 @@ Then `status.recon = "done"`.
 
 ## Done when
 
-- [ ] The **app** subdomain was crawled, not just the marketing site
+The rule for every "every/all" item below: capture it, **or** record in `coverage.md` that
+you could not and why. A checklist item is satisfied by an honest "not captured, because…"
+just as much as by the capture — never by a claim you cannot back with a file on disk. The
+`recon.mjs` baseline does not click, submit, or trigger states; those come from you driving a
+browser MCP, and where you had no such tool, that is a coverage note, not a silent tick.
+
+**Blocking — the stage is not done without these:**
+- [ ] The **app** subdomain was crawled, not just the marketing site (or its absence confirmed)
 - [ ] Every hunt-list item marked ✅/❌/🔒 with evidence or an explanation
-- [ ] Every reachable feature in `features.md` was *exercised*, not just viewed
-- [ ] Deliberate validation errors captured for every form you could submit
-- [ ] Every feature's states captured (empty/loading/partial/success/errors)
-- [ ] Raw response bodies saved for every endpoint seen
-- [ ] `samples/ids.json` + `pagination.json` + `errors.json` + `headers.json` populated
-- [ ] Bundles fetched and mined; route table, GraphQL docs, validation schemas extracted
-- [ ] Auth flow mapped (if credentialed); tokens scrubbed everywhere
-- [ ] No credential, cookie value, or bearer token appears anywhere in `blueprint-out/`
+- [ ] Raw response bodies saved for every endpoint actually seen
+- [ ] `samples/ids.json` + `pagination.json` + `errors.json` + `headers.json` populated from what was seen
+- [ ] Bundles fetched and mined; route table, GraphQL docs, validation schemas extracted where present
+- [ ] No credential, cookie value, or bearer token appears anywhere in `blueprint-out/` (incl. `traffic.har` and `storage/`)
 - [ ] `coverage.md` states honestly what was NOT reached and why
 - [ ] Ledger self-check passes
+
+**Coverage — do as much as your tools allow, and record the rest in `coverage.md`:**
+- [ ] Each reachable feature *exercised*, not just viewed — or listed as viewed-only, with why
+- [ ] Deliberate validation errors captured per submittable form — or the forms you could not submit, with why
+- [ ] Each feature's states captured (empty/loading/partial/success/errors) — or the states you could not reach
+- [ ] Auth flow mapped, if credentialed; tokens scrubbed everywhere
 
 ---
 
